@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import Paths from "./pages/Paths";
 import Courses from "./pages/Courses";
 import Masters from "./pages/Masters";
+import Missions from "./pages/Missions";
 import Community from "./pages/Community";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/paths" element={<Paths />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/masters" element={<Masters />} />
+          <Route path="/missions" element={<Missions />} />
           <Route path="/community" element={<Community />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />

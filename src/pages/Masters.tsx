@@ -5,15 +5,33 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/co
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { masters } from "@/data/mastersData";
-import { Search, Filter } from "lucide-react";
+import { masterGuides } from "@/data/mastersData.expanded";
+import { Search, Filter, BookOpen, Users, Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const Masters = () => {
   // Agrupamento por categoria
   const mastersByCategory = {
-    "Categoria A": masters.filter(master => master.category === "A"),
-    "Categoria B": masters.filter(master => master.category === "B"),
-    "Categoria C": masters.filter(master => master.category === "C")
+    "S": {
+      title: "Avatares e Fundadores",
+      masters: masterGuides.filter(master => master.category === "S"),
+      color: "bg-amber-500"
+    },
+    "A": {
+      title: "Mestres Históricos",
+      masters: masterGuides.filter(master => master.category === "A"),
+      color: "bg-primary"
+    },
+    "B": {
+      title: "Místicos e Professores",
+      masters: masterGuides.filter(master => master.category === "B"),
+      color: "bg-secondary"
+    },
+    "C": {
+      title: "Sábios e Instrutores",
+      masters: masterGuides.filter(master => master.category === "C"),
+      color: "bg-muted"
+    }
   };
 
   return (
@@ -74,19 +92,18 @@ const Masters = () => {
           </div>
 
           {/* Mestres por Categoria */}
-          {Object.entries(mastersByCategory).map(([category, categoryMasters]) => (
+          {Object.entries(mastersByCategory).map(([category, data]) => (
             <section key={category} className="mb-16">
               <h2 className="font-heading text-2xl mb-6 flex items-center">
-                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
-                  category === "Categoria A" ? "bg-primary" : 
-                  category === "Categoria B" ? "bg-secondary" : "bg-muted"
-                }`}></span>
-                {category === "Categoria A" ? "Mestres Históricos" : 
-                 category === "Categoria B" ? "Místicos e Professores" : "Sábios e Instrutores"}
+                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${data.color}`}></span>
+                {data.title}
+                {category === "S" && (
+                  <Badge className="ml-3 bg-amber-500/20 text-amber-200">Extremamente Raros</Badge>
+                )}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categoryMasters.map((master, index) => (
+                {data.masters.map((master, index) => (
                   <Card key={index} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
                     <div className="h-48 bg-gradient-to-b from-primary/10 to-secondary/10 flex items-center justify-center">
                       <span className="text-5xl">{master.icon}</span>
@@ -97,10 +114,25 @@ const Masters = () => {
                       </div>
                       <h3 className="font-heading text-xl mb-2">{master.name}</h3>
                       <p className="text-muted-foreground text-sm mb-4">{master.description}</p>
-                      <div className="mb-4">
-                        <div className="text-sm text-muted-foreground mb-1">Especialidade</div>
-                        <div className="text-sm">{master.specialty}</div>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {master.teachings.slice(0, 2).map((teaching, i) => (
+                          <Badge key={i} variant="outline" className="bg-background/50">
+                            {teaching}
+                          </Badge>
+                        ))}
                       </div>
+                      
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center">
+                          <BookOpen className="h-4 w-4 mr-1" />
+                          <span>{master.missionTypes.length} missões</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 mr-1" />
+                          <span>{master.category}</span>
+                        </div>
+                      </div>
+                      
                       <Button variant="secondary" size="sm" className="w-full">Ver Detalhes</Button>
                     </div>
                   </Card>

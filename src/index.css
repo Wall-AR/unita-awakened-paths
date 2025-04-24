@@ -2,135 +2,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
-
+ 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 250 95% 76%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 217 71% 53%;
-    --secondary-foreground: 210 40% 98%;
-
-    --accent: 275 80% 56%;
-    --accent-foreground: 210 40% 98%;
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --gold: 41 100% 59%;
+    --gold-foreground: 240 10% 3.9%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 224 76% 48%;
-
-    --gold: 43 100% 64%;
-    --gold-foreground: 0 0% 0%;
-    
     --radius: 0.5rem;
   }
-
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Raleway', sans-serif;
-    background-image: radial-gradient(circle at 50% 50%, hsl(222 47% 15%), hsl(222 47% 8%));
   }
 }
 
-@layer components {
-  .heading {
-    @apply font-heading;
-  }
-  
-  .sacred-symbol {
-    @apply opacity-10 absolute pointer-events-none;
-    animation: rotate 120s infinite linear;
-  }
-  
-  .story-link {
-    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
-  }
-  
-  .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
-  }
-  
-  .hover-glow {
-    @apply transition-all duration-300;
-  }
-  
-  .hover-glow:hover {
-    filter: drop-shadow(0 0 0.5rem theme('colors.primary.DEFAULT'));
-  }
-  
-  .path-card {
-    @apply relative overflow-hidden rounded-lg border border-border/50 bg-gradient-to-b from-card/80 to-card p-6 backdrop-blur transition-all duration-300;
-  }
-  
-  .path-card:hover {
-    @apply border-primary/50 shadow-lg;
-    transform: translateY(-5px);
-  }
-  
-  .path-card:hover .path-card-icon {
-    @apply text-primary;
-  }
-  
-  .path-card-icon {
-    @apply text-4xl mb-4 transition-colors duration-300;
-  }
+.gold-text {
+  color: var(--gold);
 }
 
-@layer utilities {
-  .gold-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400;
-  }
-  
-  .bg-sacred-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50a25 25 0 1 0 0-50 25 25 0 0 0 0 50zM50 0a12.5 12.5 0 1 1 0 25 12.5 12.5 0 0 1 0-25z' fill='%239C92AC' fill-opacity='0.03'/%3E%3C/svg%3E");
-  }
+/* Path Card Styles */
+.path-card {
+  @apply relative flex flex-col p-6 rounded-xl border border-white/10 hover:border-primary/30 transition-all duration-300;
+  min-height: 380px;
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.path-card-icon {
+  @apply text-5xl mb-4;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { 
-    filter: drop-shadow(0 0 5px rgba(165, 150, 250, 0.3));
-  }
-  50% { 
-    filter: drop-shadow(0 0 20px rgba(165, 150, 250, 0.7));
-  }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.5);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
-}

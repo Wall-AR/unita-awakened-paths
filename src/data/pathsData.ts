@@ -9,11 +9,40 @@ export interface Path {
   };
   keyElements: string[];
   masters: string[];
+  courses?: string[];
 }
 
 export const paths: Path[] = [
   {
-    name: "Caminho Hermético",
+    name: "Tradição Abraâmica",
+    description: "Explore os ensinamentos e práticas espirituais das tradições judaica, cristã e islâmica, revelando sua sabedoria ancestral e mística.",
+    icon: "✝️",
+    gradient: {
+      from: "rgba(45, 13, 83, 0.4)",
+      to: "rgba(20, 0, 50, 0.7)"
+    },
+    keyElements: [
+      "Interpretação Esotérica da Bíblia",
+      "Cabala e Misticismo Judaico",
+      "Misticismo Cristão Medieval",
+      "Sufismo e Sabedoria Islâmica"
+    ],
+    masters: [
+      "Jesus Cristo",
+      "Moisés",
+      "São Francisco de Assis",
+      "Teresa de Ávila",
+      "Rumi"
+    ],
+    courses: [
+      "A Bíblia Revelada: Para Além do Véu",
+      "A Cabala Mística: A Árvore da Vida",
+      "Misticismo Cristão: De Jesus aos Místicos Medievais",
+      "Sufismo: O Caminho do Coração"
+    ]
+  },
+  {
+    name: "Tradição Hermética",
     description: "Baseado nos princípios universais do Corpus Hermeticum e do Caibalion, revelando as leis que governam o cosmos e a consciência.",
     icon: "⚕️",
     gradient: {
@@ -28,168 +57,139 @@ export const paths: Path[] = [
     ],
     masters: [
       "Hermes Trismegisto",
-      "Paracelso",
-      "Giordano Bruno"
-    ]
-  },
-  {
-    name: "Caminho Cabalístico",
-    description: "Explora o antigo sistema místico judaico da Cabala, revelando a estrutura oculta da realidade através da Árvore da Vida.",
-    icon: "✡️",
-    gradient: {
-      from: "rgba(45, 13, 83, 0.4)",
-      to: "rgba(20, 0, 50, 0.7)"
-    },
-    keyElements: [
-      "A Árvore da Vida (Sephirot)",
-      "Os 22 Caminhos",
-      "Gematria e Numerologia Sagrada",
-      "Meditação sobre os Nomes Divinos"
+      "Saint Germain",
+      "Eliphas Levi"
     ],
-    masters: [
-      "Rabi Shimon bar Yochai",
-      "Isaac Luria",
-      "Abraham Abulafia"
+    courses: [
+      "O Caibalion: Os Sete Princípios Herméticos",
+      "Alquimia Ocidental: Da Matéria ao Espírito",
+      "A Tábua de Esmeralda e seus Segredos"
     ]
   },
   {
-    name: "Caminho Gnóstico",
-    description: "Revela o conhecimento interior (gnosis) através do estudo dos evangelhos canônicos e apócrifos, buscando a libertação espiritual.",
-    icon: "🕊️",
-    gradient: {
-      from: "rgba(83, 13, 45, 0.4)",
-      to: "rgba(50, 0, 20, 0.7)"
-    },
-    keyElements: [
-      "Evangelhos Gnósticos",
-      "Sabedoria Sophia",
-      "Simbolismo do Cristo Interior",
-      "Bibliotecas de Nag Hammadi"
-    ],
-    masters: [
-      "Jesus",
-      "Maria Madalena",
-      "Valentino"
-    ]
-  },
-  {
-    name: "Caminho Védico",
-    description: "Explora a profunda sabedoria dos Vedas e Upanishads, revelando o conhecimento do Ser e a natureza da consciência.",
+    name: "Tradição Oriental",
+    description: "Explore as profundas tradições espirituais da Ásia, incluindo as práticas contemplativas e filosóficas da Índia, China e Japão.",
     icon: "☸️",
     gradient: {
       from: "rgba(83, 45, 13, 0.4)",
       to: "rgba(50, 20, 0, 0.7)"
     },
     keyElements: [
-      "Estudo dos Upanishads",
-      "Filosofia Advaita Vedanta",
-      "Yoga e Meditação",
-      "Bhagavad Gita"
+      "Budismo e Meditação",
+      "Vedanta e Upanishads",
+      "Taoísmo e Harmonia Natural",
+      "Zen e Não-dualidade"
     ],
     masters: [
-      "Adi Shankara",
+      "Buda",
+      "Lao Tsé",
       "Patanjali",
-      "Ramana Maharshi"
+      "Paramahansa Yogananda",
+      "Thich Nhat Hanh"
+    ],
+    courses: [
+      "A Voz do Silêncio: Sabedoria Além das Palavras",
+      "Vedanta: O Conhecimento Supremo",
+      "Tao Te Ching: O Caminho do Meio",
+      "Zen: Além da Mente Dualista"
     ]
   },
   {
-    name: "Caminho Budista",
-    description: "Segue o caminho do meio ensinado por Buda, buscando a libertação do sofrimento através da meditação e sabedoria.",
-    icon: "☸️",
+    name: "Tradição Egípcia",
+    description: "Explore os antigos mistérios do Egito, seus rituais de iniciação e a sabedoria codificada em seus textos sagrados e monumentos.",
+    icon: "☥",
     gradient: {
       from: "rgba(83, 70, 13, 0.4)",
       to: "rgba(50, 40, 0, 0.7)"
     },
     keyElements: [
-      "Quatro Nobres Verdades",
-      "Caminho Óctuplo",
-      "Meditação Vipassana",
-      "Compaixão (Metta)"
+      "O Livro dos Mortos",
+      "Rituais de Iniciação",
+      "Mitologia e Deuses Egípcios",
+      "Simbolismo Hieroglífico"
     ],
     masters: [
-      "Siddharta Gautama",
-      "Nagarjuna",
-      "Thich Nhat Hanh"
+      "Hermes Trismegisto"
+    ],
+    courses: [
+      "O Livro dos Mortos: Jornada da Alma",
+      "Mitos e Mistérios do Antigo Egito"
     ]
   },
   {
-    name: "Caminho Alquímico",
-    description: "Estuda a transformação da matéria como alegoria da transmutação espiritual interior, revelando o ouro interno.",
-    icon: "⚗️",
+    name: "Tradição Ocidental Moderna",
+    description: "Estuda as escolas esotéricas modernas que surgiram nos séculos XIX e XX, integrando conhecimento antigo com novas perspectivas.",
+    icon: "🔮",
     gradient: {
       from: "rgba(13, 83, 45, 0.4)",
       to: "rgba(0, 50, 20, 0.7)"
     },
     keyElements: [
-      "As Operações Alquímicas",
-      "Simbolismo da Pedra Filosofal",
-      "Correspondências entre Macrocosmo e Microcosmo",
-      "Alquimia Prática e Espiritual"
+      "Alta Magia Cerimonial",
+      "Teosofia e Antroposofia",
+      "Rosacrucianismo",
+      "Psicologia Profunda"
     ],
     masters: [
-      "Nicolas Flamel",
-      "Paracelso",
-      "Carl Jung"
+      "Helena Blavatsky",
+      "Aleister Crowley",
+      "Rudolf Steiner",
+      "Carl Jung",
+      "Dion Fortune"
+    ],
+    courses: [
+      "Dogma e Ritual da Alta Magia",
+      "Teosofia: A Sabedoria Divina",
+      "Rosacrucianismo: O Caminho da Rosa e da Cruz"
     ]
   },
   {
-    name: "Caminho Taoísta",
-    description: "Segue o fluxo natural do Tao, buscando harmonia através do equilíbrio das forças yin e yang em todas as dimensões da existência.",
-    icon: "☯️",
+    name: "Tradição Xamânica e Pagã",
+    description: "Explora as antigas práticas xamânicas e tradições pagãs focadas na conexão com a natureza e estados alterados de consciência.",
+    icon: "🌿",
     gradient: {
       from: "rgba(13, 45, 83, 0.4)",
       to: "rgba(0, 20, 50, 0.7)"
     },
     keyElements: [
-      "Tao Te Ching",
-      "Princípio do Wu-Wei (Não-Ação)",
-      "Qigong e Cultivo da Energia Vital",
-      "Medicina Tradicional Chinesa"
+      "Técnicas de Êxtase",
+      "Trabalho com Plantas de Poder",
+      "Rituais Sazonais",
+      "Conexão com Espíritos da Natureza"
     ],
     masters: [
-      "Lao Tzu",
-      "Chuang Tzu",
-      "Wei Boyang"
+      "Carlos Castaneda"
+    ],
+    courses: [
+      "A Cozinha da Bruxa: Ervas e Rituais",
+      "Xamanismo Global: Técnicas de Êxtase"
     ]
   },
   {
-    name: "Caminho Xamânico",
-    description: "Explora as antigas práticas de comunicação com os mundos espirituais através de estados alterados de consciência e rituais sagrados.",
-    icon: "🔮",
+    name: "Caminhos Integradores",
+    description: "Abordagens que sintetizam múltiplas tradições e integram ciência contemporânea com sabedoria ancestral para uma visão holística.",
+    icon: "🔄",
     gradient: {
       from: "rgba(45, 83, 13, 0.4)",
       to: "rgba(20, 50, 0, 0.7)"
     },
     keyElements: [
-      "Jornada Xamânica",
-      "Comunicação com Espíritos da Natureza",
-      "Plantas Sagradas e Enteógenos",
-      "Rituais de Cura e Iniciação"
+      "Neurociência e Espiritualidade",
+      "Psicologia Transpessoal",
+      "Simbolismo Universal",
+      "Estados de Consciência"
     ],
     masters: [
-      "Mestres Indígenas Diversos",
-      "Carlos Castaneda",
-      "Michael Harner"
-    ]
-  },
-  {
-    name: "Caminho Místico Cristão",
-    description: "Aprofunda-se na dimensão contemplativa e mística do cristianismo, buscando a união direta com o Divino.",
-    icon: "✝️",
-    gradient: {
-      from: "rgba(13, 13, 83, 0.4)",
-      to: "rgba(0, 0, 50, 0.7)"
-    },
-    keyElements: [
-      "Teologia Negativa",
-      "Contemplação e Oração do Coração",
-      "Misticismo Apofático",
-      "Tradição Hesicasta"
+      "Carl Jung",
+      "Ram Dass",
+      "Jiddu Krishnamurti",
+      "G.I. Gurdjieff"
     ],
-    masters: [
-      "Teresa de Ávila",
-      "São João da Cruz",
-      "Mestre Eckhart"
+    courses: [
+      "Como se Tornar Sobrenatural: Integrando Ciência e Espiritualidade",
+      "Símbolos Universais: A Linguagem do Inconsciente Coletivo",
+      "Mapeando a Consciência: Estados Alterados e Expansão da Mente"
     ]
   }
 ];
+
