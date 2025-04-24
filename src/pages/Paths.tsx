@@ -54,8 +54,7 @@ const Paths = () => {
                 key={index} 
                 className="path-card"
                 style={{
-                  background: `linear-gradient(to bottom right, ${path.gradient.from}, ${path.gradient.to})`,
-                  backgroundOpacity: 0.2
+                  background: `linear-gradient(to bottom right, ${path.gradient.from}, ${path.gradient.to})`
                 }}
               >
                 <div className="path-card-icon">{path.icon}</div>
