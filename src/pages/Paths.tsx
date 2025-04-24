@@ -13,7 +13,7 @@ const Paths = () => {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink as={Link} to="/">Início</BreadcrumbLink>
+                <Link to="/" className="text-sm transition-colors hover:text-foreground">Início</Link>
               </BreadcrumbItem>
               <BreadcrumbItem>
                 <BreadcrumbPage>Caminhos</BreadcrumbPage>
