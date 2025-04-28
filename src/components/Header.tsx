@@ -13,6 +13,9 @@ const Header = () => {
           <Link to="/" className="text-sm font-medium transition-colors hover:text-primary">
             Início
           </Link>
+          <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
+            Dashboard
+          </Link>
           <Link to="/paths" className="text-sm font-medium transition-colors hover:text-primary">
             Caminhos
           </Link>

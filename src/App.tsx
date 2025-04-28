@@ -17,6 +17,9 @@ import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Dashboard from "./pages/Dashboard";
+import CourseDetail from "./pages/CourseDetail";
+import MissionDetail from "./pages/MissionDetail";
 
 const queryClient = new QueryClient();
 
@@ -28,10 +31,13 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/paths" element={<Paths />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/courses/:courseId" element={<CourseDetail />} />
           <Route path="/masters" element={<Masters />} />
           <Route path="/missions" element={<Missions />} />
+          <Route path="/missions/:missionId" element={<MissionDetail />} />
           <Route path="/community" element={<Community />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
