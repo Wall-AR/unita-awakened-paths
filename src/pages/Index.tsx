@@ -11,16 +11,18 @@ import CallToAction from "@/components/CallToAction";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-grow pt-16">
+      <main className="flex-1">
         <Hero />
-        <FeaturesSection />
-        <CoursesSection />
-        <PathsSection />
-        <MastersSection />
-        <TestimonialSection />
-        <CallToAction />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <FeaturesSection />
+          <CoursesSection />
+          <PathsSection />
+          <MastersSection />
+          <TestimonialSection />
+          <CallToAction />
+        </div>
       </main>
       <Footer />
     </div>
