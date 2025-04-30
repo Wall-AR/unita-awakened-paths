@@ -1,7 +1,7 @@
 
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { SacredSymbol } from '@/components/SacredSymbol';
+import SacredSymbol from '@/components/SacredSymbol';
 
 const Login = () => {
   return (
