@@ -7,6 +7,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => void;
+  forgotPassword: (email: string) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -96,12 +97,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const forgotPassword = async (email: string) => {
+    setIsLoading(true);
+    try {
+      // TODO: Implement actual password reset logic
+      // This is a mock implementation
+      console.log('Password reset initiated for:', email);
+      // Simulating API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.error('Password reset failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, forgotPassword, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
