@@ -10,12 +10,15 @@ import { Label } from '@/components/ui/label';
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    
     try {
       await login(email, password);
       toast({
@@ -29,6 +32,8 @@ export function LoginForm() {
         description: "Por favor verifique suas credenciais",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -63,8 +68,8 @@ export function LoginForm() {
           className="border-primary/20"
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'Entrando...' : 'Entrar'}
+      <Button type="submit" className="w-full" disabled={isLoading || isSubmitting}>
+        {isLoading || isSubmitting ? 'Entrando...' : 'Entrar'}
       </Button>
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground">

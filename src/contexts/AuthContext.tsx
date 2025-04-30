@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile } from '@/types/user';
 
 interface AuthContextType {
@@ -13,19 +13,39 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Local storage keys
+const USER_STORAGE_KEY = 'unitas_user';
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check for stored user on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Failed to parse stored user:', error);
+        localStorage.removeItem(USER_STORAGE_KEY);
+      }
+    }
+    setIsLoading(false);
+  }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // TODO: Implement actual authentication logic
       const mockUser: UserProfile = {
         id: "1",
-        username: "test_user",
+        username: email.split('@')[0],
         email: email,
-        displayName: "Test User",
+        displayName: email.split('@')[0].replace(/[^a-zA-Z0-9]/g, ' '),
         joinedDate: new Date(),
         level: 1,
         xp: 0,
@@ -37,8 +57,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           inspiration: 1
         },
         unlocks: {
-          titles: [],
-          masters: [],
+          titles: ["Novato"],
+          masters: ["hermes"],
           specialContent: []
         },
         preferences: {
@@ -48,6 +68,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           language: 'pt-BR'
         }
       };
+      
+      // Store user in local storage
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser));
       setUser(mockUser);
     } catch (error) {
       console.error('Login failed:', error);
@@ -60,6 +83,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (email: string, password: string, username: string) => {
     setIsLoading(true);
     try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // TODO: Implement actual registration logic
       const mockUser: UserProfile = {
         id: Date.now().toString(),
@@ -77,8 +103,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           inspiration: 1
         },
         unlocks: {
-          titles: [],
-          masters: [],
+          titles: ["Novato"],
+          masters: ["hermes"],
           specialContent: []
         },
         preferences: {
@@ -88,6 +114,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           language: 'pt-BR'
         }
       };
+      
+      // Store user in local storage
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mockUser));
       setUser(mockUser);
     } catch (error) {
       console.error('Registration failed:', error);
@@ -100,11 +129,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const forgotPassword = async (email: string) => {
     setIsLoading(true);
     try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // TODO: Implement actual password reset logic
       // This is a mock implementation
       console.log('Password reset initiated for:', email);
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
       console.error('Password reset failed:', error);
       throw error;
@@ -114,6 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
+    localStorage.removeItem(USER_STORAGE_KEY);
     setUser(null);
   };
 
