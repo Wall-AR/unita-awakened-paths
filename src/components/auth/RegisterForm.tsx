@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
+import { Label } from '@/components/ui/label';
 
 export function RegisterForm() {
   const [username, setUsername] = useState('');
@@ -45,50 +45,62 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-sm">
-      <div>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-2">
+        <Label htmlFor="username">Nome de usuário</Label>
         <Input
+          id="username"
           type="text"
-          placeholder="Nome de usuário"
+          placeholder="Seu nome de usuário"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
+          className="border-primary/20"
         />
       </div>
-      <div>
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
         <Input
+          id="email"
           type="email"
-          placeholder="Email"
+          placeholder="seu@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="border-primary/20"
         />
       </div>
-      <div>
+      <div className="space-y-2">
+        <Label htmlFor="password">Senha</Label>
         <Input
+          id="password"
           type="password"
-          placeholder="Senha"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          className="border-primary/20"
         />
       </div>
-      <div>
+      <div className="space-y-2">
+        <Label htmlFor="confirm-password">Confirmar senha</Label>
         <Input
+          id="confirm-password"
           type="password"
-          placeholder="Confirmar senha"
+          placeholder="••••••••"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
+          className="border-primary/20"
         />
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? 'Cadastrando...' : 'Cadastrar'}
       </Button>
-      <div className="text-center mt-4">
+      <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground">
           Já tem uma conta?{' '}
-          <Link to="/login" className="text-primary hover:underline">
+          <Link to="/login" className="text-primary font-medium hover:underline">
             Entrar
           </Link>
         </p>
