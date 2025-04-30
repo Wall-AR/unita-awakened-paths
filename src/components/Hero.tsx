@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import SacredSymbol from "./SacredSymbol";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -20,11 +21,15 @@ const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Button className="w-full sm:w-auto px-8 py-6 text-lg bg-primary hover:bg-primary/90">
-              Iniciar Jornada
+            <Button className="w-full sm:w-auto px-8 py-6 text-lg bg-primary hover:bg-primary/90" asChild>
+              <Link to="/register">
+                Iniciar Jornada
+              </Link>
             </Button>
-            <Button variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg border-primary/50 hover:border-primary">
-              Conheça mais
+            <Button variant="outline" className="w-full sm:w-auto px-8 py-6 text-lg border-primary/50 hover:border-primary" asChild>
+              <Link to="/courses">
+                Conheça mais
+              </Link>
             </Button>
           </div>
           

@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
@@ -106,8 +105,12 @@ const Courses = () => {
                   </div>
                   
                   <div className="flex flex-col xs:flex-row gap-4">
-                    <Button>Iniciar Curso</Button>
-                    <Button variant="outline">Detalhes</Button>
+                    <Button asChild>
+                      <Link to={`/courses/${courses[0].id}`}>Iniciar Curso</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link to={`/courses/${courses[0].id}`}>Detalhes</Link>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -144,7 +147,9 @@ const Courses = () => {
                       </div>
                     </div>
                     
-                    <Button variant="secondary" size="sm" className="w-full">Ver Curso</Button>
+                    <Button variant="secondary" size="sm" className="w-full" asChild>
+                      <Link to={`/courses/${course.id}`}>Ver Curso</Link>
+                    </Button>
                   </div>
                 </Card>
               ))}
@@ -158,7 +163,9 @@ const Courses = () => {
               Todos os cursos incluem um nível introdutório gratuito. Registre-se agora e comece a 
               explorar a sabedoria ancestral através de nossa abordagem transformadora e interativa.
             </p>
-            <Button size="lg">Criar Conta Gratuita</Button>
+            <Button size="lg" asChild>
+              <Link to="/register">Criar Conta Gratuita</Link>
+            </Button>
           </div>
         </div>
       </main>

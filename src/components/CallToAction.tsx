@@ -28,15 +28,18 @@ const CallToAction = () => {
               className="w-full sm:w-auto px-8 py-6 text-lg bg-primary hover:bg-primary/90"
               asChild
             >
-              <Link to="/signup">
+              <Link to="/register">
                 Criar Conta Gratuita
               </Link>
             </Button>
             <Button 
               variant="outline" 
               className="w-full sm:w-auto px-8 py-6 text-lg border-primary/50 hover:border-primary"
+              asChild
             >
-              Explorar Cursos
+              <Link to="/courses">
+                Explorar Cursos
+              </Link>
             </Button>
           </div>
           
