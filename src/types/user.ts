@@ -30,10 +30,13 @@ export interface UserUnlocks {
 }
 
 export interface UserPreferences {
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'system';
   notifications: boolean;
   emailUpdates: boolean;
   language: string;
+  profileVisibility: 'public' | 'private' | 'followers';
+  twoFactorEnabled: boolean;
+  activityLogging: boolean;
 }
 
 export interface UserProgress {

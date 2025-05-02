@@ -65,7 +65,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           theme: 'light',
           notifications: true,
           emailUpdates: true,
-          language: 'pt-BR'
+          language: 'pt-BR',
+          profileVisibility: 'public',
+          twoFactorEnabled: false,
+          activityLogging: true
         }
       };
       
@@ -111,7 +114,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           theme: 'light',
           notifications: true,
           emailUpdates: true,
-          language: 'pt-BR'
+          language: 'pt-BR',
+          profileVisibility: 'public',
+          twoFactorEnabled: false,
+          activityLogging: true
         }
       };
       
