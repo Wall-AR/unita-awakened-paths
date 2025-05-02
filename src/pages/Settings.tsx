@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Lock, Shield, Bell, Palette } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { 
@@ -43,6 +44,17 @@ const Settings = () => {
   const [theme, setTheme] = useState<"light" | "dark" | "system">(user?.preferences?.theme || 'light');
   const [language, setLanguage] = useState(user?.preferences?.language || 'pt-BR');
 
+  // Security settings
+  const [profileVisibility, setProfileVisibility] = useState<"public" | "private" | "followers">(
+    user?.preferences?.profileVisibility || 'public'
+  );
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState<boolean>(
+    user?.preferences?.twoFactorEnabled || false
+  );
+  const [activityLogging, setActivityLogging] = useState<boolean>(
+    user?.preferences?.activityLogging || true
+  );
+
   // Create handler functions instead of directly passing useState setters
   const handleEmailUpdatesChange = (checked: boolean) => {
     setEmailUpdates(checked);
@@ -58,6 +70,18 @@ const Settings = () => {
 
   const handleLanguageChange = (value: string) => {
     setLanguage(value);
+  };
+
+  const handleProfileVisibilityChange = (value: "public" | "private" | "followers") => {
+    setProfileVisibility(value);
+  };
+
+  const handleTwoFactorChange = (checked: boolean) => {
+    setTwoFactorEnabled(checked);
+  };
+
+  const handleActivityLoggingChange = (checked: boolean) => {
+    setActivityLogging(checked);
   };
 
   const handleSaveNotifications = async () => {
@@ -90,6 +114,21 @@ const Settings = () => {
     setIsSubmitting(false);
   };
 
+  const handleSaveSecurity = async () => {
+    setIsSubmitting(true);
+    
+    // Simulate API request delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // In a real implementation, this would update the user's settings in the backend
+    toast({
+      title: "Configurações salvas",
+      description: "Suas configurações de segurança foram atualizadas",
+    });
+    
+    setIsSubmitting(false);
+  };
+
   if (!user) {
     return null;
   }
@@ -103,9 +142,19 @@ const Settings = () => {
             <h1 className="text-3xl font-heading mb-8">Configurações</h1>
             
             <Tabs defaultValue="notifications">
-              <TabsList className="grid grid-cols-2 mb-8">
-                <TabsTrigger value="notifications">Notificações</TabsTrigger>
-                <TabsTrigger value="appearance">Aparência</TabsTrigger>
+              <TabsList className="grid grid-cols-3 mb-8">
+                <TabsTrigger value="notifications">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notificações
+                </TabsTrigger>
+                <TabsTrigger value="appearance">
+                  <Palette className="h-4 w-4 mr-2" />
+                  Aparência
+                </TabsTrigger>
+                <TabsTrigger value="security">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Segurança
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="notifications">
@@ -219,6 +268,95 @@ const Settings = () => {
                         <>
                           <Save className="mr-2 h-4 w-4" />
                           Salvar preferências
+                        </>
+                      )}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="security">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Segurança e Privacidade</CardTitle>
+                    <CardDescription>
+                      Gerencie suas configurações de segurança e privacidade
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="profile-visibility">Visibilidade do Perfil</Label>
+                      <Select value={profileVisibility} onValueChange={handleProfileVisibilityChange}>
+                        <SelectTrigger id="profile-visibility" className="w-full md:w-[200px]">
+                          <SelectValue placeholder="Selecione a visibilidade" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="public">Público</SelectItem>
+                          <SelectItem value="followers">Apenas Seguidores</SelectItem>
+                          <SelectItem value="private">Privado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Controle quem pode ver seu perfil e progresso
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <Label htmlFor="two-factor">Autenticação de Dois Fatores</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Adicione uma camada extra de segurança à sua conta
+                        </p>
+                      </div>
+                      <Switch
+                        id="two-factor"
+                        checked={twoFactorEnabled}
+                        onCheckedChange={handleTwoFactorChange}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <Label htmlFor="activity-log">Registro de Atividades</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Mantenha um histórico de acessos e atividades da sua conta
+                        </p>
+                      </div>
+                      <Switch
+                        id="activity-log"
+                        checked={activityLogging}
+                        onCheckedChange={handleActivityLoggingChange}
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t border-border">
+                      <h3 className="font-medium mb-2">Ações de Segurança</h3>
+                      <div className="space-y-2">
+                        <Button variant="outline" className="w-full justify-start">
+                          <Lock className="mr-2 h-4 w-4" />
+                          Alterar Senha
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive">
+                          Desativar Conta
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="ml-auto" 
+                      onClick={handleSaveSecurity}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Salvar configurações
                         </>
                       )}
                     </Button>
