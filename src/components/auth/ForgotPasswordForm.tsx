@@ -6,15 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { forgotPassword, isLoading } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    
     try {
       await forgotPassword(email);
       setIsSubmitted(true);
@@ -28,8 +32,12 @@ export function ForgotPasswordForm() {
         description: "Não foi possível enviar o email de recuperação",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const loading = isLoading || isSubmitting;
 
   return (
     <>
@@ -67,10 +75,16 @@ export function ForgotPasswordForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="border-primary/20"
+              disabled={loading}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Enviando...' : 'Recuperar senha'}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : 'Recuperar senha'}
           </Button>
           <div className="text-center mt-6">
             <p className="text-sm text-muted-foreground">

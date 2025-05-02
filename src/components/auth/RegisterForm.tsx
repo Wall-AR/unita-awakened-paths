@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 
 export function RegisterForm() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -28,6 +30,8 @@ export function RegisterForm() {
       return;
     }
 
+    setIsSubmitting(true);
+    
     try {
       await register(email, password, username);
       toast({
@@ -41,8 +45,12 @@ export function RegisterForm() {
         description: "Não foi possível completar o cadastro",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const loading = isLoading || isSubmitting;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -56,6 +64,7 @@ export function RegisterForm() {
           onChange={(e) => setUsername(e.target.value)}
           required
           className="border-primary/20"
+          disabled={loading}
         />
       </div>
       <div className="space-y-2">
@@ -68,6 +77,7 @@ export function RegisterForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           className="border-primary/20"
+          disabled={loading}
         />
       </div>
       <div className="space-y-2">
@@ -80,6 +90,7 @@ export function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           className="border-primary/20"
+          disabled={loading}
         />
       </div>
       <div className="space-y-2">
@@ -92,10 +103,16 @@ export function RegisterForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
           className="border-primary/20"
+          disabled={loading}
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Cadastrando...
+          </>
+        ) : 'Cadastrar'}
       </Button>
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground">

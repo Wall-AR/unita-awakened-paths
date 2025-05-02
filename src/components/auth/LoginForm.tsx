@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -37,6 +38,8 @@ export function LoginForm() {
     }
   };
 
+  const loading = isLoading || isSubmitting;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
@@ -49,6 +52,7 @@ export function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           className="border-primary/20"
+          disabled={loading}
         />
       </div>
       <div className="space-y-2">
@@ -66,10 +70,16 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           className="border-primary/20"
+          disabled={loading}
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading || isSubmitting}>
-        {isLoading || isSubmitting ? 'Entrando...' : 'Entrar'}
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Entrando...
+          </>
+        ) : 'Entrar'}
       </Button>
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground">
