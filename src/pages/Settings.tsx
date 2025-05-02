@@ -35,13 +35,30 @@ const Settings = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Notifications settings
-  const [emailUpdates, setEmailUpdates] = useState(user?.preferences?.emailUpdates || true);
-  const [notifications, setNotifications] = useState(user?.preferences?.notifications || true);
+  // Notifications settings - fixed from true to boolean type
+  const [emailUpdates, setEmailUpdates] = useState<boolean>(user?.preferences?.emailUpdates || true);
+  const [notifications, setNotifications] = useState<boolean>(user?.preferences?.notifications || true);
   
-  // Appearance settings
-  const [theme, setTheme] = useState(user?.preferences?.theme || 'light');
+  // Appearance settings - specify the exact type for theme
+  const [theme, setTheme] = useState<"light" | "dark" | "system">(user?.preferences?.theme || 'light');
   const [language, setLanguage] = useState(user?.preferences?.language || 'pt-BR');
+
+  // Create handler functions instead of directly passing useState setters
+  const handleEmailUpdatesChange = (checked: boolean) => {
+    setEmailUpdates(checked);
+  };
+
+  const handleNotificationsChange = (checked: boolean) => {
+    setNotifications(checked);
+  };
+
+  const handleThemeChange = (value: "light" | "dark" | "system") => {
+    setTheme(value);
+  };
+
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value);
+  };
 
   const handleSaveNotifications = async () => {
     setIsSubmitting(true);
@@ -110,7 +127,7 @@ const Settings = () => {
                       <Switch
                         id="email-updates"
                         checked={emailUpdates}
-                        onCheckedChange={setEmailUpdates}
+                        onCheckedChange={handleEmailUpdatesChange}
                       />
                     </div>
                     
@@ -124,7 +141,7 @@ const Settings = () => {
                       <Switch
                         id="notifications"
                         checked={notifications}
-                        onCheckedChange={setNotifications}
+                        onCheckedChange={handleNotificationsChange}
                       />
                     </div>
                   </CardContent>
@@ -161,7 +178,7 @@ const Settings = () => {
                   <CardContent className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="theme">Tema</Label>
-                      <Select value={theme} onValueChange={setTheme}>
+                      <Select value={theme} onValueChange={handleThemeChange}>
                         <SelectTrigger id="theme" className="w-full md:w-[200px]">
                           <SelectValue placeholder="Selecione um tema" />
                         </SelectTrigger>
@@ -175,7 +192,7 @@ const Settings = () => {
                     
                     <div className="space-y-2">
                       <Label htmlFor="language">Idioma</Label>
-                      <Select value={language} onValueChange={setLanguage}>
+                      <Select value={language} onValueChange={handleLanguageChange}>
                         <SelectTrigger id="language" className="w-full md:w-[200px]">
                           <SelectValue placeholder="Selecione um idioma" />
                         </SelectTrigger>
