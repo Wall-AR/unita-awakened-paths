@@ -30,6 +30,8 @@ export interface UserProfile {
   unlocks: UserUnlocks;
   /** The user's personalized preferences for the platform. */
   preferences: UserPreferences;
+  /** Freemium Model: The user's current subscription tier. */
+  subscriptionTier: 'free' | 'seeker' | 'initiate' | 'adept';
 }
 
 /**

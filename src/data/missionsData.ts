@@ -38,7 +38,8 @@ export const missions: Mission[] = [
         "Harmonia": 3
       },
       unlockable: "Título: \"Observador Hermético\" (após 5 missões similares)"
-    }
+    },
+    requiredTier: 'initiate',
   },
   
   // Missão de Jesus
@@ -72,7 +73,8 @@ export const missions: Mission[] = [
         "Compaixão": 7,
         "Integridade": 3
       }
-    }
+    },
+    requiredTier: 'free',
   },
   
   // Missão de Buda
@@ -108,7 +110,8 @@ export const missions: Mission[] = [
         "Sabedoria": 3
       },
       unlockable: "Desbloqueio da missão avançada \"Observação dos Cinco Agregados\""
-    }
+    },
+    requiredTier: 'free',
   },
   
   // Missão de Carl Jung
@@ -147,7 +150,8 @@ export const missions: Mission[] = [
         "Harmonia": 3
       },
       unlockable: "Acesso ao material avançado \"Arquétipos e Individuação\""
-    }
+    },
+    requiredTier: 'seeker',
   }
 ];
 

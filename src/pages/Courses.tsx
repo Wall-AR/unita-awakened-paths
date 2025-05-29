@@ -1,13 +1,16 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Filter, Clock, BookOpen, Award } from "lucide-react";
+import { Search, Filter, Clock, BookOpen, Award, Lock } from "lucide-react"; // Added Lock
 import { useQuery } from "@tanstack/react-query";
-import { getCourses, getFeaturedCourses } from "@/services/courseService"; // Assuming getFeaturedCourses will be used
+import { getCourses } from "@/services/courseService"; 
 import { Course } from "@/types/course";
+import AccessBadge from "@/components/ui/AccessBadge"; 
+import { useAuth } from "@/contexts/AuthContext"; // Added useAuth
+import { canAccessContent } from "@/lib/permissions"; // Added canAccessContent
 
 /**
  * @page Courses
@@ -15,13 +18,15 @@ import { Course } from "@/types/course";
  * and filtering options. It fetches course data using the `courseService`.
  */
 const Courses = () => {
+  const { user } = useAuth(); // Get user from AuthContext
+  const navigate = useNavigate(); // For redirecting if access denied on click
+
   const { data: allCourses, isLoading: isLoadingAllCourses, error: errorAllCourses } = useQuery<Course[], Error>({ 
     queryKey: ['courses'], 
     queryFn: getCourses 
   });
 
-  // Example: If you want to fetch featured courses separately or derive them
-  // For this example, we'll filter from allCourses, but you could make a separate query
+  // For this example, we'll filter from allCourses for featured/other
   const featuredCourse = allCourses?.find(course => course.isFeatured);
   const otherCourses = allCourses?.filter(course => !course.isFeatured);
 
@@ -114,20 +119,40 @@ const Courses = () => {
           </div>
 
           {/* Curso em Destaque */}
-          {featuredCourse && (
+          {featuredCourse && (() => {
+            const hasAccess = canAccessContent(user?.subscriptionTier, featuredCourse, 'course');
+            const cardClasses = `bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden ${!hasAccess ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/30'}`;
+            
+            const handleCardClick = (e: React.MouseEvent) => {
+              if (!hasAccess) {
+                e.preventDefault();
+                // Optionally, show a modal or toast here
+                // navigate('/pricing'); // Or to a specific "upgrade" page
+                alert("Você não tem acesso a este curso. Considere fazer um upgrade no seu plano.");
+              }
+            };
+
+            return (
             <section className="mb-16">
               <h2 className="font-heading text-2xl mb-6">Em Destaque</h2>
-              <Card className="bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
+              <Card className={cardClasses} onClick={handleCardClick}>
                 <div className="md:flex">
-                  <div className="md:w-2/5 h-64 md:h-auto bg-gradient-to-br from-primary/20 via-secondary/10 to-background">
+                  <div className="md:w-2/5 h-64 md:h-auto bg-gradient-to-br from-primary/20 via-secondary/10 to-background relative">
+                    {!hasAccess && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Lock className="h-12 w-12 text-white/70" /></div>}
                     <div className="h-full w-full flex items-center justify-center p-12">
                       <span className="text-7xl">{featuredCourse.icon}</span>
                     </div>
                   </div>
                   <div className="md:w-3/5 p-6">
-                    <div className="mb-4">
-                      <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-xs mr-2">{featuredCourse.tradition}</span>
-                      <span className="inline-block px-3 py-1 rounded-full bg-secondary/20 text-xs">Nível 1-4</span> {/* This level display might need adjustment based on actual data */}
+                    <div className="mb-4 flex flex-wrap gap-2 items-center">
+                      <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-xs">{featuredCourse.tradition}</span>
+                      <span className="inline-block px-3 py-1 rounded-full bg-secondary/20 text-xs">{featuredCourse.level}</span> 
+                      <AccessBadge 
+                        contentType="course"
+                        accessLevel={featuredCourse.accessLevel}
+                        isFeaturedFree={featuredCourse.isFeaturedFree}
+                        oneTimePurchasePrice={featuredCourse.oneTimePurchasePrice}
+                      />
                     </div>
                     <h3 className="font-heading text-2xl md:text-3xl mb-3">{featuredCourse.title}</h3>
                     <p className="text-muted-foreground mb-6">{featuredCourse.description}</p>
@@ -148,34 +173,57 @@ const Courses = () => {
                     </div>
                     
                     <div className="flex flex-col xs:flex-row gap-4">
-                      <Button asChild>
-                        <Link to={`/courses/${featuredCourse.id}`}>Iniciar Curso</Link>
+                      <Button asChild disabled={!hasAccess}>
+                        <Link to={hasAccess ? `/courses/${featuredCourse.id}` : '#'}>
+                          {hasAccess ? 'Iniciar Curso' : 'Acesso Requerido'}
+                        </Link>
                       </Button>
-                      <Button variant="outline" asChild>
-                        <Link to={`/courses/${featuredCourse.id}`}>Detalhes</Link>
+                      <Button variant="outline" asChild disabled={!hasAccess}>
+                        <Link to={hasAccess ? `/courses/${featuredCourse.id}` : '#'}>Detalhes</Link>
                       </Button>
                     </div>
                   </div>
                 </div>
               </Card>
             </section>
-          )}
+          )})}
 
           {/* Lista de Cursos */}
           <section className="mb-16">
             <h2 className="font-heading text-2xl mb-6">Cursos Disponíveis</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {otherCourses?.map((course) => (
-                <Card key={course.id} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
-                  <div className="h-48 bg-gradient-to-br from-primary/10 via-secondary/5 to-background flex items-center justify-center">
+              {otherCourses?.map((course) => {
+                const hasAccess = canAccessContent(user?.subscriptionTier, course, 'course');
+                const cardClasses = `overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 transition-all duration-300 ${!hasAccess ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/30'}`;
+                
+                const handleCardClick = (e: React.MouseEvent) => {
+                  if (!hasAccess) {
+                    e.preventDefault();
+                    alert("Você não tem acesso a este curso. Considere fazer um upgrade no seu plano.");
+                    // navigate('/pricing'); 
+                  } else {
+                    navigate(`/courses/${course.id}`);
+                  }
+                };
+
+                return (
+                <Card key={course.id} className={cardClasses} onClick={handleCardClick}>
+                  <div className="h-48 bg-gradient-to-br from-primary/10 via-secondary/5 to-background flex items-center justify-center relative">
+                    {!hasAccess && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Lock className="h-10 w-10 text-white/70" /></div>}
                     <span className="text-5xl">{course.icon}</span>
                   </div>
                   <div className="p-6">
-                    <div className="mb-3">
-                      <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-xs mr-2">{course.tradition}</span>
+                    <div className="mb-3 flex flex-wrap gap-2 items-center">
+                      <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-xs">{course.tradition}</span>
                       {course.isNew && (
-                        <span className="inline-block px-3 py-1 rounded-full bg-accent/20 text-xs">Novo</span>
+                        <span className="inline-block px-3 py-1 rounded-full bg-green-500/20 text-green-50 text-xs">Novo</span>
                       )}
+                       <AccessBadge 
+                        contentType="course"
+                        accessLevel={course.accessLevel}
+                        isFeaturedFree={course.isFeaturedFree}
+                        oneTimePurchasePrice={course.oneTimePurchasePrice}
+                      />
                     </div>
                     <h3 className="font-heading text-xl mb-3">{course.title}</h3>
                     <p className="text-muted-foreground text-sm mb-4">{course.description}</p>
@@ -191,12 +239,12 @@ const Courses = () => {
                       </div>
                     </div>
                     
-                    <Button variant="secondary" size="sm" className="w-full" asChild>
-                      <Link to={`/courses/${course.id}`}>Ver Curso</Link>
+                    <Button variant="secondary" size="sm" className="w-full" disabled={!hasAccess}>
+                      {hasAccess ? 'Ver Curso' : 'Acesso Requerido'}
                     </Button>
                   </div>
                 </Card>
-              ))}
+              )})}
             </div>
           </section>
 

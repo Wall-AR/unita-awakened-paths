@@ -9,9 +9,13 @@ import CourseInformation from "@/components/courses/CourseInformation";
 import CourseActions from "@/components/courses/CourseActions";
 import RelatedCourses from "@/components/courses/RelatedCourses";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button"; // Added Button
+import { Lock } from "lucide-react"; // Added Lock
 import { useQuery } from "@tanstack/react-query";
 import { getCourseById } from "@/services/courseService";
 import { Course } from "@/types/course";
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
 
 /**
  * @page CourseDetail
@@ -22,12 +26,15 @@ import { Course } from "@/types/course";
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const [activeTab, setActiveTab] = useState("modules");
+  const { user } = useAuth(); // Get user
 
   const { data: course, isLoading, error } = useQuery<Course | undefined, Error>({
     queryKey: ['course', courseId],
-    queryFn: () => getCourseById(courseId!), // Non-null assertion as courseId should be present
-    enabled: !!courseId, // Only run query if courseId is available
+    queryFn: () => getCourseById(courseId!), 
+    enabled: !!courseId, 
   });
+
+  const hasFullCourseAccess = course ? canAccessContent(user?.subscriptionTier, course, 'course') : false;
   
   if (isLoading) {
     return (
@@ -75,8 +82,25 @@ const CourseDetail = () => {
         <CourseHeader course={course} />
         
         <div className="container mx-auto px-4 py-8">
+          {!hasFullCourseAccess && course.accessLevel !== 'free' && (
+            <div className="mb-8 p-6 bg-destructive/10 border border-destructive/30 rounded-lg text-center">
+              <Lock className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h2 className="text-2xl font-semibold text-destructive mb-3">Acesso Restrito</h2>
+              <p className="text-destructive/90 mb-1">
+                Você precisa do <span className="font-bold">{course.accessLevel === 'purchase' ? 'curso comprado' : `Plano ${course.accessLevel.charAt(0).toUpperCase() + course.accessLevel.slice(1)}`}</span> ou superior para acessar o conteúdo completo deste curso.
+              </p>
+              {course.accessLevel !== 'purchase' && (
+                 <p className="text-destructive/80 mb-4 text-sm">Algumas lições iniciais podem estar disponíveis gratuitamente.</p>
+              )}
+              <Button size="lg" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                Ver Planos de Assinatura {/* Or link to purchase if accessLevel is 'purchase' */}
+              </Button>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
+              {/* Ensure CourseModules is aware of hasFullCourseAccess or uses useAuth itself */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="mb-6">
                   <TabsTrigger value="modules">Módulos</TabsTrigger>
@@ -104,7 +128,8 @@ const CourseDetail = () => {
             </div>
             
             <div className="space-y-6">
-              <CourseActions course={course} />
+              {/* Pass hasFullCourseAccess or let CourseActions use useAuth */}
+              <CourseActions course={course} hasFullAccess={hasFullCourseAccess} /> 
               <RelatedCourses courseId={course.id} tradition={course.tradition} />
             </div>
           </div>

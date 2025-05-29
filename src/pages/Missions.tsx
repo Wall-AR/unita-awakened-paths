@@ -8,16 +8,21 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { getMissions } from "@/services/missionService";
-import { getMasters } from "@/services/masterService"; // To fetch master details
+import { getMasters } from "@/services/masterService"; 
 import { Mission } from "@/types/mission";
 import { Master } from "@/types/master";
+import AccessBadge from "@/components/ui/AccessBadge"; 
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
 import { 
   BookOpen, Clock, CheckCircle, Star, 
   AlarmClock, Medal, Lightbulb, Flame, Hand, 
-  HeartHandshake, Compass, BrainCircuit 
+  HeartHandshake, Compass, BrainCircuit, Lock // Added Lock
 } from "lucide-react";
 
 const Missions = () => {
+  const { user } = useAuth(); // Get user
+
   const { data: missionsData, isLoading: isLoadingMissions, error: errorMissions } = useQuery<Mission[], Error>({
     queryKey: ['missions'],
     queryFn: getMissions
@@ -148,19 +153,38 @@ const Missions = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {missionsData?.map((mission) => {
                 const master = getMaster(mission.masterId);
+                const hasAccess = canAccessContent(user?.subscriptionTier, mission, 'mission');
+                const cardClasses = `bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden relative ${!hasAccess ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/30'}`;
+                
+                const handleMissionCardClick = (e: React.MouseEvent) => {
+                  if (!hasAccess) {
+                    e.preventDefault();
+                    alert("Você não tem acesso a esta missão. Considere fazer um upgrade no seu plano.");
+                    // navigate('/pricing');
+                  } else {
+                    // navigate(`/missions/${mission.id}`); // Or use Link component if not preventing default
+                  }
+                };
+
                 return (
-                  <Card key={mission.id} className="bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
+                  <Card key={mission.id} className={cardClasses} onClick={handleMissionCardClick}>
+                    {!hasAccess && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10 rounded-lg">
+                        <Lock className="h-10 w-10 text-white/70" />
+                      </div>
+                    )}
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge className={levelColors[mission.level]}>
+                        <div className={!hasAccess ? 'pointer-events-none' : ''}>
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <Badge className={`${levelColors[mission.level]} whitespace-nowrap`}>
                               {formatLevel(mission.level)}
                             </Badge>
-                            <Badge variant="outline" className="flex items-center gap-1">
+                            <Badge variant="outline" className="flex items-center gap-1 whitespace-nowrap">
                               {missionTypeIcons[mission.type]}
                               {formatType(mission.type)}
                             </Badge>
+                            <AccessBadge contentType="mission" requiredTier={mission.requiredTier} />
                           </div>
                           <h3 className="font-heading text-xl">{mission.title}</h3>
                         </div>
@@ -196,8 +220,12 @@ const Missions = () => {
                             </Badge>
                           ))}
                         </div>
-                        <Button variant="default" size="sm" asChild>
-                           <Link to={`/missions/${mission.id}`}>Iniciar Missão</Link>
+                        <Button variant="default" size="sm" asChild={hasAccess} disabled={!hasAccess}>
+                          {hasAccess ? (
+                            <Link to={`/missions/${mission.id}`}>Iniciar Missão</Link>
+                          ) : (
+                            <span>Acesso Requerido</span>
+                          )}
                         </Button>
                       </div>
                     </div>

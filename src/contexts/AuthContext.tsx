@@ -38,6 +38,8 @@ interface AuthContextType {
   authError: Error | null;
   /** A boolean flag indicating if the user is currently authenticated. */
   isAuthenticated: boolean;
+  /** Updates the current user's subscription tier. */
+  updateUserSubscriptionTier: (newTier: 'free' | 'seeker' | 'initiate' | 'adept') => void;
 }
 
 /**
@@ -58,8 +60,9 @@ const MOCK_USER_1: UserProfile = {
   level: 5,
   xp: 1250,
   attributes: { wisdom: 10, compassion: 8, harmony: 7, integrity: 9, inspiration: 6 },
-  unlocks: { titles: ["Explorer", "Adept"], masters: ["hermes"], specialContent: [] }, // Assuming 'hermes' is a valid masterId
-  preferences: { theme: 'dark', notifications: true, emailUpdates: false, language: 'en-US', profileVisibility: 'private', twoFactorEnabled: false, activityLogging: true }
+  unlocks: { titles: ["Explorer", "Adept"], masters: ["hermes"], specialContent: [] }, 
+  preferences: { theme: 'dark', notifications: true, emailUpdates: false, language: 'en-US', profileVisibility: 'private', twoFactorEnabled: false, activityLogging: true },
+  subscriptionTier: 'initiate', // Added subscription tier
 };
 
 const MOCK_USER_2: UserProfile = {
@@ -72,7 +75,8 @@ const MOCK_USER_2: UserProfile = {
   xp: 300,
   attributes: { wisdom: 5, compassion: 5, harmony: 5, integrity: 5, inspiration: 5 },
   unlocks: { titles: ["Seeker"], masters: [], specialContent: [] },
-  preferences: { theme: 'light', notifications: false, emailUpdates: true, language: 'pt-BR', profileVisibility: 'public', twoFactorEnabled: false, activityLogging: false }
+  preferences: { theme: 'light', notifications: false, emailUpdates: true, language: 'pt-BR', profileVisibility: 'public', twoFactorEnabled: false, activityLogging: false },
+  subscriptionTier: 'free', // Added subscription tier
 };
 
 /**
@@ -91,7 +95,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedUser = localStorage.getItem(USER_STORAGE_KEY);
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser: UserProfile = JSON.parse(storedUser);
+        // Ensure subscriptionTier exists, default if not (for backward compatibility)
+        if (!parsedUser.subscriptionTier) {
+          parsedUser.subscriptionTier = 'free';
+        }
+        setUser(parsedUser);
       } catch (error) {
         console.error('Failed to parse stored user:', error);
         localStorage.removeItem(USER_STORAGE_KEY);
@@ -166,7 +175,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           profileVisibility: 'public',
           twoFactorEnabled: false,
           activityLogging: true
-        }
+        },
+        subscriptionTier: 'free', // Default tier for new users
       };
       
       // Store user in local storage
@@ -207,6 +217,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAuthError(null); // Clear any errors on logout
   };
 
+  const updateUserSubscriptionTier = (newTier: 'free' | 'seeker' | 'initiate' | 'adept') => {
+    if (user) {
+      const updatedUser = { ...user, subscriptionTier: newTier };
+      setUser(updatedUser);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
+      console.log(`User subscription tier updated to: ${newTier}`);
+      // toast({ title: "Subscription Updated", description: `Your plan is now: ${newTier}` }); // If toast is available
+    } else {
+      console.warn("No user logged in to update subscription tier.");
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
         user, 
@@ -216,7 +238,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         forgotPassword, 
         isLoading, 
         authError, 
-        isAuthenticated: !!user 
+        isAuthenticated: !!user,
+        updateUserSubscriptionTier,
       }}>
       {children}
     </AuthContext.Provider>

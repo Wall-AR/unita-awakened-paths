@@ -7,32 +7,40 @@ import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+// import { Badge } from "@/components/ui/badge"; // Replaced by AccessBadge where appropriate
+import { Link, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import AccessBadge from "@/components/ui/AccessBadge"; 
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
+import { Lock } from "lucide-react"; // Added
 
 // Helper to mock enrollment and progress
 interface EnrolledCourse extends Course {
   userProgress: number;
-  isEnrolled: boolean; // Explicitly track enrollment
+  isEnrolled: boolean; 
+  hasAccess: boolean; // Added to store access status
 }
 
 const MyCourses = () => {
+  const { user } = useAuth(); // Get user
+  const navigate = useNavigate(); // For navigation
+
   const { data: allCourses, isLoading, error } = useQuery<Course[], Error>({
     queryKey: ['courses'],
     queryFn: getCourses,
   });
 
-  // Mocking enrollment and progress
+  // Mocking enrollment and progress, now considering access
   const enrolledCourses: EnrolledCourse[] = allCourses
     ? allCourses.map((course, index) => {
-        // Mock enrollment: enroll in first 3 courses, or if a course is marked as 'Gratuito' in description (example)
-        const isMockEnrolled = index < 2 || course.name.toLowerCase().includes("gratuito") || (course.level && course.level.toLowerCase() === 'iniciante');
-        
+        const isMockEnrolled = index < 2 || course.accessLevel === 'free' || !!course.isFeaturedFree;
+        const hasAccess = canAccessContent(user?.subscriptionTier, course, 'course');
         return {
           ...course,
           isEnrolled: isMockEnrolled,
           userProgress: isMockEnrolled ? Math.floor(Math.random() * 100) : 0,
+          hasAccess: hasAccess, 
         };
       }).filter(course => course.isEnrolled)
     : [];
@@ -85,32 +93,61 @@ const MyCourses = () => {
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-6">Cursos em Andamento</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {ongoingCourses.map(course => (
-                <Card key={course.id} className="flex flex-col">
-                  {course.image && (
-                    <img src={course.image} alt={course.name} className="rounded-t-lg h-48 w-full object-cover"/>
-                  )}
-                  <CardHeader>
-                    <CardTitle>{course.name}</CardTitle>
-                    {/* Mock premium badge based on description or some other logic */}
-                    {!course.description?.toLowerCase().includes("gratuito") && Math.random() > 0.5 && (
-                        <Badge variant="destructive" className="absolute top-4 right-4">Premium</Badge>
-                    )}
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {course.description ? `${course.description.substring(0, 100)}...` : 'Sem descrição.'}
-                    </p>
-                    <Progress value={course.userProgress} className="h-2 mb-1" />
-                    <p className="text-xs text-muted-foreground text-right">{course.userProgress}% completo</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button asChild className="w-full" variant="outline">
-                      <Link to={`/courses/${course.id}`}>Continuar Curso</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+              {ongoingCourses.map(course => {
+                const cardClasses = `flex flex-col ${!course.hasAccess ? 'opacity-60 cursor-not-allowed' : ''}`;
+                const handleCardInteraction = () => {
+                  if (!course.hasAccess) {
+                    alert("Seu acesso a este curso expirou ou seu plano não o inclui mais. Verifique seus planos.");
+                    // navigate('/pricing'); // Or specific page
+                  } else {
+                    navigate(`/courses/${course.id}`);
+                  }
+                };
+
+                return (
+                  <Card key={course.id} className={cardClasses}>
+                    <div className="relative">
+                      {course.image && (
+                        <img src={course.image} alt={course.title} className="rounded-t-lg h-48 w-full object-cover"/>
+                      )}
+                      {!course.hasAccess && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-t-lg">
+                          <Lock className="h-10 w-10 text-white/80" />
+                        </div>
+                      )}
+                    </div>
+                    <CardHeader onClick={!course.hasAccess ? handleCardInteraction : undefined} className={course.hasAccess ? 'cursor-pointer' : ''}>
+                      <div className="flex justify-between items-start">
+                        <CardTitle>{course.title}</CardTitle>
+                        <AccessBadge 
+                          contentType="course"
+                          accessLevel={course.accessLevel}
+                          isFeaturedFree={course.isFeaturedFree}
+                          oneTimePurchasePrice={course.oneTimePurchasePrice}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow" onClick={!course.hasAccess ? handleCardInteraction : undefined} >
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {course.description ? `${course.description.substring(0, 100)}...` : 'Sem descrição.'}
+                      </p>
+                      {course.hasAccess ? (
+                        <>
+                          <Progress value={course.userProgress} className="h-2 mb-1" />
+                          <p className="text-xs text-muted-foreground text-right">{course.userProgress}% completo</p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-destructive text-center font-semibold">Acesso Requerido</p>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button onClick={handleCardInteraction} className="w-full" variant={course.hasAccess ? "outline" : "destructive"} disabled={!course.hasAccess && false /* Enable to allow click to pricing */}>
+                        {course.hasAccess ? 'Continuar Curso' : 'Ver Planos'}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           </section>
         )}
@@ -119,31 +156,57 @@ const MyCourses = () => {
           <section>
             <h2 className="text-2xl font-semibold mb-6">Cursos Concluídos</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {completedCourses.map(course => (
-                <Card key={course.id} className="flex flex-col opacity-75 hover:opacity-100 transition-opacity">
-                   {course.image && (
-                    <img src={course.image} alt={course.name} className="rounded-t-lg h-48 w-full object-cover"/>
-                  )}
-                  <CardHeader>
-                    <CardTitle>{course.name}</CardTitle>
-                     {!course.description?.toLowerCase().includes("gratuito") && Math.random() > 0.5 && (
-                        <Badge variant="destructive" className="absolute top-4 right-4">Premium</Badge>
-                    )}
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                     <p className="text-sm text-muted-foreground mb-3">
-                      {course.description ? `${course.description.substring(0, 100)}...` : 'Sem descrição.'}
-                    </p>
-                    <Progress value={100} className="h-2 mb-1" />
-                    <p className="text-xs text-muted-foreground text-right">100% completo</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button asChild className="w-full" variant="default">
-                      <Link to={`/courses/${course.id}`}>Revisar Curso</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+              {completedCourses.map(course => {
+                // For completed courses, access might still be relevant if they want to review
+                const cardClasses = `flex flex-col transition-opacity ${!course.hasAccess ? 'opacity-60 cursor-not-allowed' : 'opacity-85 hover:opacity-100'}`;
+                 const handleCardInteraction = () => {
+                  if (!course.hasAccess) {
+                    alert("Seu acesso a este curso expirou ou seu plano não o inclui mais para revisão. Verifique seus planos.");
+                    // navigate('/pricing'); 
+                  } else {
+                    navigate(`/courses/${course.id}`);
+                  }
+                };
+
+                return (
+                  <Card key={course.id} className={cardClasses}>
+                     <div className="relative">
+                        {course.image && (
+                          <img src={course.image} alt={course.title} className="rounded-t-lg h-48 w-full object-cover"/>
+                        )}
+                        {!course.hasAccess && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-t-lg">
+                            <Lock className="h-10 w-10 text-white/80" />
+                          </div>
+                        )}
+                      </div>
+                    <CardHeader onClick={!course.hasAccess ? handleCardInteraction : undefined} className={course.hasAccess ? 'cursor-pointer' : ''}>
+                      <div className="flex justify-between items-start">
+                        <CardTitle>{course.title}</CardTitle>
+                        <AccessBadge 
+                          contentType="course"
+                          accessLevel={course.accessLevel}
+                          isFeaturedFree={course.isFeaturedFree}
+                          oneTimePurchasePrice={course.oneTimePurchasePrice}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow" onClick={!course.hasAccess ? handleCardInteraction : undefined}>
+                       <p className="text-sm text-muted-foreground mb-3">
+                        {course.description ? `${course.description.substring(0, 100)}...` : 'Sem descrição.'}
+                      </p>
+                      <Progress value={100} className="h-2 mb-1" />
+                      <p className="text-xs text-muted-foreground text-right">100% completo</p>
+                       {!course.hasAccess && <p className="text-xs text-destructive text-center font-semibold mt-2">Revisão Requer Assinatura</p>}
+                    </CardContent>
+                    <CardFooter>
+                      <Button onClick={handleCardInteraction} className="w-full" variant="default" disabled={!course.hasAccess && false}>
+                        {course.hasAccess ? 'Revisar Curso' : 'Ver Planos'}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           </section>
         )}

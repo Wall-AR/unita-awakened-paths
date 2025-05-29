@@ -3,14 +3,17 @@ import React from "react";
 import { Course } from "@/types/course";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import AccessBadge from "@/components/ui/AccessBadge"; // Added
+import { Lock } from "lucide-react"; // Added
 
 interface CourseActionsProps {
   course: Course;
+  hasFullAccess: boolean; // Added
 }
 
-const CourseActions: React.FC<CourseActionsProps> = ({ course }) => {
-  // Determina se o usuário está inscrito (mock)
-  const isEnrolled = false;
+const CourseActions: React.FC<CourseActionsProps> = ({ course, hasFullAccess }) => {
+  // Determina se o usuário está inscrito (mock - replace with actual user progress)
+  const isEnrolled = false; 
   
   // Determina o progresso se inscrito (mock)
   const progress = {
@@ -46,34 +49,39 @@ const CourseActions: React.FC<CourseActionsProps> = ({ course }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="text-center">
-              {course.isFree ? (
-                <h3 className="text-xl font-heading text-green-500">Curso Gratuito</h3>
-              ) : course.premium ? (
-                <h3 className="text-xl font-heading gold-text">Curso Premium</h3>
-              ) : (
-                <h3 className="text-xl font-heading text-amber-500">Parcialmente Gratuito</h3>
-              )}
+            <div className="text-center mb-4">
+               <AccessBadge 
+                  contentType="course"
+                  accessLevel={course.accessLevel}
+                  isFeaturedFree={course.isFeaturedFree}
+                  oneTimePurchasePrice={course.oneTimePurchasePrice}
+                  className="text-base px-4 py-2" // Larger badge
+                />
               
-              <p className="text-sm text-muted-foreground mt-1">
-                {course.isFree 
-                  ? "Acesso completo a todo o conteúdo" 
-                  : course.premium 
-                    ? "Disponível para assinantes Premium" 
-                    : "Primeiros módulos gratuitos"
-                }
-              </p>
+              {!hasFullAccess && course.accessLevel !== 'free' && (
+                <p className="text-xs text-muted-foreground mt-2 flex items-center justify-center">
+                  <Lock className="h-3 w-3 mr-1" /> Acesso completo requer upgrade ou compra.
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
-              <Button className="w-full">Inscrever-se no Curso</Button>
-              {!course.isFree && (
-                <Button variant="outline" className="w-full">Acessar Versão Gratuita</Button>
+              {hasFullAccess ? (
+                <Button className="w-full">Inscrever-se no Curso</Button> // Or "Acessar Curso" if already purchased/subscribed
+              ) : course.accessLevel === 'purchase' ? (
+                <Button className="w-full">Comprar Curso (R${course.oneTimePurchasePrice?.toFixed(2)})</Button>
+              ) : (
+                <Button className="w-full">Ver Planos de Assinatura</Button>
+              )}
+
+              {/* Show "Access Free Lessons" if course is not free but user doesn't have full access, AND if there are any free lessons */}
+              {!hasFullAccess && course.accessLevel !== 'free' && course.structure?.levels.some(l => l.modules.some(m => m.lessons.some(les => les.accessLevel === 'free'))) && (
+                <Button variant="outline" className="w-full">Acessar Aulas Gratuitas</Button>
               )}
             </div>
             
             <div className="mt-4 text-xs text-center text-muted-foreground">
-              Acesso vitalício a todas as atualizações do curso
+              {course.accessLevel === 'purchase' ? 'Acesso vitalício ao comprar.' : 'Acesso com assinatura ativa.'}
             </div>
           </div>
         )}

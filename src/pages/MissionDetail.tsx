@@ -1,9 +1,13 @@
 
 import React, { useState } from "react";
-import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+// Removed duplicate React import
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
+import { Lock } from "lucide-react"; // Added
+import AccessBadge from "@/components/ui/AccessBadge"; // Import AccessBadge
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -17,22 +21,24 @@ import { Master } from "@/types/master";
 
 const MissionDetail = () => {
   const { missionId } = useParams<{ missionId: string }>();
-  const [activeTab, setActiveTab] = useState("modules"); // Although not used here, kept for consistency if tabs were added
+  // const [activeTab, setActiveTab] = useState("modules"); // Not used
+  const { user } = useAuth(); // Get user
+  const navigate = useNavigate(); // For navigation
 
   const { data: mission, isLoading: isLoadingMission, error: errorMission } = useQuery<Mission | undefined, Error>({
     queryKey: ['mission', missionId],
     queryFn: () => getMissionById(missionId!),
     enabled: !!missionId,
   });
+  
+  const hasAccess = mission ? canAccessContent(user?.subscriptionTier, mission, 'mission') : false;
 
   const { data: master, isLoading: isLoadingMaster, error: errorMaster } = useQuery<Master | undefined, Error>({
     queryKey: ['master', mission?.masterId],
     queryFn: () => getMasterById(mission?.masterId!),
-    enabled: !!mission?.masterId, // Only run if mission and mission.masterId are available
+    enabled: !!mission?.masterId, 
   });
   
-  // Mock de progresso da missão (seria carregado de um estado real do usuário)
-  // This state should ideally be managed by a custom hook or global state if it needs to persist
   const [completedSteps, setCompletedSteps] = useState<Record<string, boolean>>({});
   
   const progress = mission?.steps 
@@ -99,8 +105,21 @@ const MissionDetail = () => {
               &larr; Voltar para Missões
             </Link>
           </div>
+
+          {!hasAccess && mission && mission.requiredTier !== 'free' && (
+            <div className="my-8 p-6 bg-destructive/10 border border-destructive/30 rounded-lg text-center">
+              <Lock className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h2 className="text-2xl font-semibold text-destructive mb-3">Acesso Restrito à Missão</h2>
+              <p className="text-destructive/90 mb-4">
+                Você precisa do <span className="font-bold">{`Plano ${mission.requiredTier.charAt(0).toUpperCase() + mission.requiredTier.slice(1)}`}</span> ou superior para acessar esta missão.
+              </p>
+              <Button size="lg" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground" onClick={() => navigate('/pricing')}>
+                Ver Planos de Assinatura
+              </Button>
+            </div>
+          )}
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${!hasAccess && mission && mission.requiredTier !== 'free' ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="lg:col-span-2 space-y-6">
               {/* Cabeçalho da Missão */}
               <Card>
@@ -118,9 +137,10 @@ const MissionDetail = () => {
                           {mission.level === "beginner" ? "Iniciante" : 
                            mission.level === "intermediate" ? "Intermediário" : "Avançado"}
                         </span>
-                        <span className="text-xs px-2 py-1 bg-muted/30 rounded-full">
+                        <span className="text-xs px-2 py-1 bg-muted/30 rounded-full whitespace-nowrap">
                           Duração: {mission.duration}
                         </span>
+                        <AccessBadge contentType="mission" requiredTier={mission.requiredTier} />
                       </div>
                     </div>
                     
@@ -185,8 +205,9 @@ const MissionDetail = () => {
                           <Checkbox 
                             checked={!!completedSteps[step.id]}
                             onCheckedChange={() => toggleStep(step.id)}
+                            disabled={!hasAccess && mission.requiredTier !== 'free'}
                           />
-                          <span className={completedSteps[step.id] ? "line-through text-muted-foreground" : ""}>
+                          <span className={`${completedSteps[step.id] ? "line-through text-muted-foreground" : ""} ${!hasAccess && mission.requiredTier !== 'free' ? 'cursor-not-allowed' : ''}`}>
                             {step.description}
                           </span>
                         </div>
@@ -209,28 +230,20 @@ const MissionDetail = () => {
                       <li key={item.id} className="p-3 border border-border/50 rounded-lg">
                         <h3 className="font-medium mb-1">{item.description}</h3>
                         {/* Basic file upload / text input example - actual implementation would be more complex */}
-                        {item.type === 'text' && <textarea className="w-full p-2 border rounded bg-background/50" placeholder="Sua resposta aqui..." rows={3}></textarea>}
-                        {(item.type === 'image' || item.type === 'audio' || item.type === 'video') && <input type="file" className="text-sm" />}
+                        {item.type === 'text' && <textarea className="w-full p-2 border rounded bg-background/50" placeholder="Sua resposta aqui..." rows={3} disabled={!hasAccess && mission.requiredTier !== 'free'}></textarea>}
+                        {(item.type === 'image' || item.type === 'audio' || item.type === 'video') && <input type="file" className="text-sm" disabled={!hasAccess && mission.requiredTier !== 'free'} />}
                         {item.type === 'checklist' && item.checklistItems?.map((checkItem, cIdx) => (
                           <div key={cIdx} className="flex items-center gap-2 mt-1">
-                            <Checkbox id={`${item.id}-check-${cIdx}`} />
-                            <label htmlFor={`${item.id}-check-${cIdx}`} className="text-sm">{checkItem}</label>
+                            <Checkbox id={`${item.id}-check-${cIdx}`} disabled={!hasAccess && mission.requiredTier !== 'free'} />
+                            <label htmlFor={`${item.id}-check-${cIdx}`} className={`text-sm ${!hasAccess && mission.requiredTier !== 'free' ? 'cursor-not-allowed text-muted-foreground' : ''}`}>{checkItem}</label>
                           </div>
                         ))}
-                        {/* <div className="mt-2">
-                          <Button variant="outline" size="sm" className="mr-2">
-                            Carregar Arquivo
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            Adicionar Texto
-                          </Button>
-                        </div> */}
                       </li>
                     ))}
                   </ul>
                   
                   <div className="mt-6">
-                    <Button disabled={progress < 100}>Enviar Missão para Avaliação</Button>
+                    <Button disabled={progress < 100 || (!hasAccess && mission.requiredTier !== 'free')}>Enviar Missão para Avaliação</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -324,13 +337,13 @@ const MissionDetail = () => {
               {/* Ações */}
               <Card>
                 <CardContent className="p-6 space-y-3">
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" disabled={!hasAccess && mission.requiredTier !== 'free'}>
                     Solicitar Orientação
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" disabled={!hasAccess && mission.requiredTier !== 'free'}>
                     Salvar para Depois
                   </Button>
-                  <Button variant="outline" className="w-full text-destructive hover:text-destructive">
+                  <Button variant="outline" className="w-full text-destructive hover:text-destructive" disabled={!hasAccess && mission.requiredTier !== 'free'}>
                     Abandonar Missão
                   </Button>
                 </CardContent>

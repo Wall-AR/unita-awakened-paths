@@ -1,6 +1,9 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getMasterById } from "@/services/masterService";
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
+import { Lock } from "lucide-react"; // Added
 import { getCourses } from "@/services/courseService"; // Fetch all and filter
 import { getMissions } from "@/services/missionService"; // Fetch all and filter by masterId
 import type { Master, Course, Mission } from "@/types";
@@ -9,18 +12,23 @@ import { Footer } from "@/components/layout/Footer";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge"; // Replaced by AccessBadge or used for other purposes
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icon } from "@iconify/react";
+import AccessBadge from "@/components/ui/AccessBadge"; // Import the new badge
 
 const MasterDetail = () => {
   const { masterId } = useParams<{ masterId: string }>();
+  const { user } = useAuth(); // Get user
+  const navigate = useNavigate(); // For navigation
 
   const { data: master, isLoading: isLoadingMaster, error: errorMaster } = useQuery<Master | undefined, Error>({
     queryKey: ['master', masterId],
     queryFn: () => getMasterById(masterId!),
     enabled: !!masterId,
   });
+
+  const hasMasterAccess = master ? canAccessContent(user?.subscriptionTier, master, 'master') : false;
 
   // Fetch all courses and filter by this master
   const { data: allCourses, isLoading: isLoadingCourses, error: errorCourses } = useQuery<Course[], Error>({
@@ -70,12 +78,6 @@ const MasterDetail = () => {
     { label: master.name, href: `/masters/${master.id}` },
   ];
   
-  // Mock Tier for master
-  const masterTiers = ["Gratuito", "Tier 1", "Tier 2", "Tier 3"];
-  const randomTierIndex = Math.floor(Math.random() * masterTiers.length);
-  const mockMasterTier = masterTiers[randomTierIndex];
-
-
   return (
     <>
       <Header />
@@ -89,11 +91,10 @@ const MasterDetail = () => {
           </Avatar>
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-bold">{master.name}</h1>
-            <p className="mt-1 text-xl text-muted-foreground">{master.title}</p>
-            <p className="mt-1 text-md text-primary">{master.category} - {master.tradition}</p>
-            <Badge className="mt-2" variant={mockMasterTier === "Gratuito" ? "default" : "destructive"}>
-              {mockMasterTier === "Gratuito" ? "Acesso Gratuito" : `Requer ${mockMasterTier}`}
-            </Badge>
+            <p className="mt-1 text-xl text-muted-foreground">{master.category} - {master.tradition}</p> 
+            <div className="mt-2">
+              <AccessBadge contentType="master" requiredTier={master.requiredTier} />
+            </div>
             {master.quote && (
                 <blockquote className="mt-4 border-l-4 pl-4 italic text-muted-foreground">
                     "{master.quote}"
@@ -101,49 +102,110 @@ const MasterDetail = () => {
             )}
           </div>
         </header>
+
+        {!hasMasterAccess && master.requiredTier !== 'free' && (
+          <div className="mb-8 p-6 bg-destructive/10 border border-destructive/30 rounded-lg text-center">
+            <Lock className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-destructive mb-3">Acesso Restrito ao Mestre</h2>
+            <p className="text-destructive/90 mb-4">
+              Você precisa do <span className="font-bold">{`Plano ${master.requiredTier.charAt(0).toUpperCase() + master.requiredTier.slice(1)}`}</span> ou superior para acessar todos os detalhes e conteúdos deste Mestre.
+            </p>
+            <Button size="lg" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+              Ver Planos de Assinatura
+            </Button>
+          </div>
+        )}
         
-        {master.description && (
-          <section className="mb-12 p-6 bg-card rounded-lg shadow">
-            <h2 className="mb-3 text-2xl font-semibold">Sobre {master.name}</h2>
-            <p className="text-muted-foreground whitespace-pre-line">{master.description}</p>
-          </section>
-        )}
-
-        {master.teachings && master.teachings.length > 0 && (
-            <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-semibold">Principais Ensinamentos</h2>
-                <ul className="list-disc list-inside space-y-2 pl-4 text-muted-foreground">
-                    {master.teachings.map((teaching, index) => (
-                        <li key={index}>{teaching}</li>
-                    ))}
-                </ul>
+        <div className={!hasMasterAccess && master.requiredTier !== 'free' ? 'opacity-50 pointer-events-none' : ''}>
+          {master.description && (
+            <section className="mb-12 p-6 bg-card rounded-lg shadow">
+              <h2 className="mb-3 text-2xl font-semibold">Sobre {master.name}</h2>
+              <p className="text-muted-foreground whitespace-pre-line">{master.description}</p>
             </section>
-        )}
+          )}
 
+          {master.teachings && master.teachings.length > 0 && (
+              <section className="mb-12">
+                  <h2 className="mb-4 text-2xl font-semibold">Principais Ensinamentos</h2>
+                  <ul className="list-disc list-inside space-y-2 pl-4 text-muted-foreground">
+                      {master.teachings.map((teaching, index) => (
+                          <li key={index}>{teaching}</li>
+                      ))}
+                  </ul>
+              </section>
+          )}
 
-        <section id="master-courses" className="mb-12">
-          <h2 className="mb-6 text-3xl font-semibold">Cursos Ministrados</h2>
-          {masterCourses.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {masterCourses.map((course) => (
-                <Card key={course.id} className="flex flex-col">
-                  <CardHeader>
-                    <CardTitle>{course.name}</CardTitle>
-                    <Badge variant={Math.random() > 0.5 ? "default" : "secondary"} className="absolute right-4 top-4">
-                      {Math.random() > 0.5 ? "Gratuito" : "Premium"}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground">{course.description?.substring(0, 100)}...</p>
-                  </CardContent>
-                  <div className="p-6 pt-0">
-                    <Link to={`/courses/${course.id}`}>
-                      <Button variant="outline" className="w-full">Ver Curso</Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
+          <section id="master-courses" className="mb-12">
+            <h2 className="mb-6 text-3xl font-semibold">Cursos Ministrados</h2>
+            {masterCourses.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {masterCourses.map((course) => {
+                  // Access for individual courses is still managed by their own AccessBadge and link logic
+                  const courseAccessible = canAccessContent(user?.subscriptionTier, course, 'course');
+                  return (
+                    <Card key={course.id} className={`flex flex-col ${!courseAccessible && hasMasterAccess ? 'opacity-70' : ''}`}>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <CardTitle>{course.title}</CardTitle>
+                          <AccessBadge 
+                            contentType="course"
+                            accessLevel={course.accessLevel}
+                            isFeaturedFree={course.isFeaturedFree}
+                            oneTimePurchasePrice={course.oneTimePurchasePrice}
+                          />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <p className="text-sm text-muted-foreground">{course.description?.substring(0, 100)}...</p>
+                      </CardContent>
+                      <div className="p-6 pt-0">
+                        <Button asChild variant="outline" className="w-full" disabled={!courseAccessible && hasMasterAccess}>
+                          <Link to={courseAccessible || !hasMasterAccess ? `/courses/${course.id}` : '#'}>
+                            {courseAccessible || !hasMasterAccess ? 'Ver Curso' : 'Acesso Requerido'}
+                          </Link>
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
+              <p>Nenhum curso diretamente associado a este mestre encontrado.</p>
+            )}
+          </section>
+
+          <section id="master-missions" className="mb-12">
+            <h2 className="mb-6 text-3xl font-semibold">Missões Guiadas</h2>
+            {masterMissions.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {masterMissions.map((mission) => {
+                  const missionAccessible = canAccessContent(user?.subscriptionTier, mission, 'mission');
+                  return (
+                  <Card key={mission.id} className={!missionAccessible && hasMasterAccess ? 'opacity-70' : ''}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <CardTitle>{mission.title}</CardTitle>
+                        <AccessBadge contentType="mission" requiredTier={mission.requiredTier} />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{mission.description?.substring(0, 150)}...</p>
+                    </CardContent>
+                    <div className="p-6 pt-0">
+                       <Button asChild variant="outline" className="w-full" disabled={!missionAccessible && hasMasterAccess}>
+                        <Link to={missionAccessible || !hasMasterAccess ? `/missions/${mission.id}` : '#'}>
+                          {missionAccessible || !hasMasterAccess ? 'Ver Missão' : 'Acesso Requerido'}
+                        </Link>
+                      </Button>
+                    </div>
+                  </Card>
+                )})}
+              </div>
+            ) : (
+              <p>Nenhuma missão diretamente guiada por este mestre encontrada.</p>
+            )}
+          </section>
+        </div>
           ) : (
             <p>Nenhum curso diretamente associado a este mestre encontrado.</p>
           )}
@@ -156,10 +218,10 @@ const MasterDetail = () => {
               {masterMissions.map((mission) => (
                 <Card key={mission.id}>
                   <CardHeader>
-                    <CardTitle>{mission.title}</CardTitle>
-                     <Badge variant={Math.random() > 0.3 ? "outline" : "destructive"} className="mt-1">
-                      {Math.random() > 0.3 ? "Tier 1+" : "Tier 3"}
-                    </Badge>
+                    <div className="flex justify-between items-start">
+                      <CardTitle>{mission.title}</CardTitle>
+                      <AccessBadge contentType="mission" requiredTier={mission.requiredTier} />
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">{mission.description?.substring(0, 150)}...</p>
