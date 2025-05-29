@@ -1,6 +1,9 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getPathById } from "@/services/pathService";
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
+import { Lock } from "lucide-react"; // Added
 import { getCourses } from "@/services/courseService"; // Fetch all and filter
 import { getMasters } from "@/services/masterService"; // Fetch all and filter
 import type { Path, Course, Master } from "@/types";
@@ -9,12 +12,15 @@ import { Footer } from "@/components/layout/Footer";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge"; // Replaced by AccessBadge where appropriate
 import { Progress } from "@/components/ui/progress"; // For potential future use
 import { Icon } from "@iconify/react"; // For path icon
+import AccessBadge from "@/components/ui/AccessBadge"; // Import the new badge
 
 const PathDetail = () => {
   const { pathId } = useParams<{ pathId: string }>();
+  const { user } = useAuth(); // Get user
+  const navigate = useNavigate(); // For navigation
 
   const { data: path, isLoading: isLoadingPath, error: errorPath } = useQuery<Path | undefined, Error>({
     queryKey: ['path', pathId],
@@ -91,24 +97,52 @@ const PathDetail = () => {
           <h2 className="mb-6 text-3xl font-semibold">Cursos neste Caminho</h2>
           {pathCourses.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {pathCourses.map((course) => (
-                <Card key={course.id} className="flex flex-col">
-                  <CardHeader>
-                    <CardTitle>{course.name}</CardTitle>
-                    <Badge variant={Math.random() > 0.5 ? "default" : "secondary"} className="absolute right-4 top-4">
-                      {Math.random() > 0.5 ? "Gratuito" : "Premium"}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground">{course.description?.substring(0, 100)}...</p>
-                  </CardContent>
-                  <div className="p-6 pt-0">
-                    <Link to={`/courses/${course.id}`}>
-                      <Button variant="outline" className="w-full">Ver Curso</Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
+              {pathCourses.map((course) => {
+                const hasAccess = canAccessContent(user?.subscriptionTier, course, 'course');
+                const cardClasses = `flex flex-col ${!hasAccess ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-lg'}`;
+                
+                const handleCourseClick = (e: React.MouseEvent) => {
+                  if (!hasAccess) {
+                    e.preventDefault();
+                    alert("Você não tem acesso a este curso. Considere fazer um upgrade no seu plano ou adquirir o curso.");
+                  } else {
+                    navigate(`/courses/${course.id}`);
+                  }
+                };
+
+                return (
+                  <Card key={course.id} className={cardClasses}>
+                    <div className="relative h-40 bg-muted/30 rounded-t-lg flex items-center justify-center">
+                      {/* Placeholder for course image or icon */}
+                      {course.icon && <Icon icon={course.icon} className="h-16 w-16 text-muted-foreground" />}
+                       {!hasAccess && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-t-lg">
+                          <Lock className="h-10 w-10 text-white/80" />
+                        </div>
+                      )}
+                    </div>
+                    <CardHeader onClick={!hasAccess ? handleCourseClick : undefined} className={hasAccess ? 'cursor-pointer' : ''}>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{course.title}</CardTitle>
+                        <AccessBadge 
+                          contentType="course"
+                          accessLevel={course.accessLevel}
+                          isFeaturedFree={course.isFeaturedFree}
+                          oneTimePurchasePrice={course.oneTimePurchasePrice}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow" onClick={!hasAccess ? handleCourseClick : undefined} >
+                      <p className="text-sm text-muted-foreground line-clamp-3">{course.description}</p>
+                    </CardContent>
+                    <div className="p-4 pt-0">
+                      <Button onClick={handleCourseClick} variant="outline" className="w-full" disabled={!hasAccess && false}>
+                        {hasAccess ? 'Ver Curso' : 'Acesso Requerido'}
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <p>Nenhum curso encontrado para este caminho.</p>
@@ -119,26 +153,50 @@ const PathDetail = () => {
           <h2 className="mb-6 text-3xl font-semibold">Mestres deste Caminho</h2>
           {pathMasters.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {pathMasters.map((master) => (
-                <Card key={master.id} className="text-center">
-                  <CardHeader>
-                    <div className="mx-auto mb-3 h-20 w-20 overflow-hidden rounded-full border-2 border-primary">
-                      <img src={master.image || '/images/placeholder-master.png'} alt={master.name} className="h-full w-full object-cover" />
+              {pathMasters.map((master) => {
+                const hasAccess = canAccessContent(user?.subscriptionTier, master, 'master');
+                const cardClasses = `text-center ${!hasAccess ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-lg'}`;
+                
+                const handleMasterClick = (e: React.MouseEvent) => {
+                  if (!hasAccess) {
+                    e.preventDefault();
+                    alert("Você não tem acesso a este mestre. Considere fazer um upgrade no seu plano.");
+                  } else {
+                    // Assuming a master detail page exists at /masters/:masterId
+                    navigate(`/masters/${master.id}`); 
+                  }
+                };
+
+                return (
+                  <Card key={master.id} className={cardClasses} onClick={handleMasterClick}>
+                    <CardHeader>
+                      <div className="relative mx-auto mb-3 h-20 w-20 overflow-hidden rounded-full border-2 border-primary">
+                        <img src={master.image || '/images/placeholder-master.png'} alt={master.name} className="h-full w-full object-cover" />
+                        {!hasAccess && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-full">
+                            <Lock className="h-8 w-8 text-white/80" />
+                          </div>
+                        )}
+                      </div>
+                      <CardTitle>{master.name}</CardTitle>
+                      <div className="mt-1">
+                        <AccessBadge
+                          contentType="master"
+                          requiredTier={master.requiredTier}
+                        />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{master.category} - {master.tradition}</p>
+                    </CardContent>
+                    <div className="p-4 pt-0">
+                      <Button variant="ghost" size="sm" className="w-full" disabled={!hasAccess && false}>
+                        {hasAccess ? 'Ver Mestre' : 'Acesso Requerido'}
+                      </Button>
                     </div>
-                    <CardTitle>{master.name}</CardTitle>
-                     <Badge variant={Math.random() > 0.3 ? "outline" : "destructive"} className="mt-1">
-                      {Math.random() > 0.3 ? "Tier 1+" : "Tier 3"}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{master.title}</p>
-                  </CardContent>
-                  <div className="p-6 pt-0">
-                     {/* Link to MasterDetail would go here if it exists */}
-                    <Button variant="ghost" size="sm">Ver Mestre</Button>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <p>Nenhum mestre encontrado para este caminho.</p>

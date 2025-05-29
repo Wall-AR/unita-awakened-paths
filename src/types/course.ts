@@ -26,12 +26,16 @@ export interface Course {
   isNew?: boolean;
   /** Indicates if the course is currently featured. */
   isFeatured?: boolean;
-  /** Indicates if the course is available for free. */
-  isFree?: boolean;
-  /** Indicates if the course is a premium offering. */
-  premium?: boolean;
+  // isFree?: boolean; // Replaced by accessLevel
+  // premium?: boolean; // Replaced by accessLevel
   /** A list of prerequisite course IDs or descriptions. */
   prerequisites?: string[];
+  /** Freemium Model: Defines the access tier required for this course. */
+  accessLevel: 'free' | 'seeker' | 'initiate' | 'adept' | 'purchase';
+  /** Freemium Model: Price for one-time purchase if accessLevel is 'purchase'. */
+  oneTimePurchasePrice?: number;
+  /** Freemium Model: Highlights specific free courses beyond just accessLevel: 'free'. */
+  isFeaturedFree?: boolean;
   /** A list of skills that will be developed or enhanced by taking this course. */
   skills?: string[];
   /** URL for the course's cover image. */
@@ -66,8 +70,7 @@ export interface CourseLevel {
   name: string;
   /** A description of what this level covers. */
   description: string;
-  /** Indicates if this specific level is free. */
-  isFree: boolean;
+  // isFree: boolean; // Replaced by lesson-level accessLevel
   /** An array of modules contained within this level. */
   modules: CourseModule[];
 }
@@ -117,6 +120,8 @@ export interface Lesson {
   interactiveElements?: InteractiveElement[];
   /** Indicates if completing this lesson is required for module/course completion. */
   requiredForCompletion: boolean;
+  /** Freemium Model: Defines the access tier required for this specific lesson. */
+  accessLevel: 'free' | 'seeker' | 'initiate' | 'adept';
 }
 
 /**

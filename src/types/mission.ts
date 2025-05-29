@@ -16,6 +16,8 @@ export interface Mission {
     unlockable?: string;
   };
   requiredItems?: string[];
+  /** Freemium Model: Defines the access tier required for this mission. */
+  requiredTier: 'free' | 'seeker' | 'initiate' | 'adept';
 }
 
 export interface MissionStep {

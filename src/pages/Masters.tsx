@@ -2,16 +2,22 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Filter, BookOpen, Users, Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Search, Filter, BookOpen, Users, Star, Lock } from "lucide-react"; // Added Lock
+import { Badge } from "@/components/ui/badge"; 
 import { useQuery } from "@tanstack/react-query";
 import { getMasters } from "@/services/masterService";
 import { Master } from "@/types/master";
+import AccessBadge from "@/components/ui/AccessBadge"; 
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { canAccessContent } from "@/lib/permissions"; // Added
 
 const Masters = () => {
+  const { user } = useAuth(); // Get user
+  const navigate = useNavigate(); // For navigation
+
   const { data: allMasters, isLoading, error } = useQuery<Master[], Error>({
     queryKey: ['masters'],
     queryFn: getMasters
@@ -138,14 +144,30 @@ const Masters = () => {
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {data.masters.map((master) => (
-                  <Card key={master.id} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
-                    <div className="h-48 bg-gradient-to-b from-primary/10 to-secondary/10 flex items-center justify-center">
+                {data.masters.map((master) => {
+                  const hasAccess = canAccessContent(user?.subscriptionTier, master, 'master');
+                  const cardClasses = `overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 transition-all duration-300 ${!hasAccess ? 'opacity-60 cursor-not-allowed' : 'hover:border-primary/30'}`;
+                  
+                  const handleMasterCardClick = (e: React.MouseEvent) => {
+                    if (!hasAccess) {
+                      e.preventDefault();
+                      alert("Você não tem acesso a este mestre. Considere fazer um upgrade no seu plano.");
+                      // navigate('/pricing');
+                    } else {
+                      navigate(`/masters/${master.id}`);
+                    }
+                  };
+
+                  return (
+                  <Card key={master.id} className={cardClasses} onClick={handleMasterCardClick}>
+                    <div className="h-48 bg-gradient-to-b from-primary/10 to-secondary/10 flex items-center justify-center relative">
+                      {!hasAccess && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Lock className="h-10 w-10 text-white/70" /></div>}
                       <span className="text-5xl">{master.icon}</span>
                     </div>
                     <div className="p-6">
-                      <div className="mb-1">
+                      <div className="flex flex-wrap gap-2 mb-2 items-center">
                         <span className="text-xs px-2 py-1 rounded-full bg-primary/20">{master.tradition}</span>
+                        <AccessBadge contentType="master" requiredTier={master.requiredTier} />
                       </div>
                       <h3 className="font-heading text-xl mb-2">{master.name}</h3>
                       <p className="text-muted-foreground text-sm mb-4">{master.description}</p>
@@ -168,12 +190,13 @@ const Masters = () => {
                         </div>
                       </div>
                       
-                      <Link to={`/masters/${master.id}`} className="w-full">
-                        <Button variant="secondary" size="sm" className="w-full">Ver Detalhes</Button>
-                      </Link>
+                      {/* The Link component itself won't be disabled, so clicks are handled by handleMasterCardClick on Card */}
+                      <Button variant="secondary" size="sm" className="w-full" disabled={!hasAccess && false}>
+                         {hasAccess ? 'Ver Detalhes' : 'Acesso Requerido'}
+                      </Button>
                     </div>
                   </Card>
-                ))}
+                )})}
               </div>
             </section>
           )})}

@@ -41,4 +41,6 @@ export interface Master {
   missions: string[]; 
   /** An array of specialization path IDs compatible with this master's teachings. */
   specializations: string[]; 
+  /** Freemium Model: Defines the access tier required to interact with this master. */
+  requiredTier: 'free' | 'seeker' | 'initiate' | 'adept';
 }
