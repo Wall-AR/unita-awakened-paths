@@ -24,7 +24,7 @@ const PathDetail = () => {
 
   const { data: path, isLoading: isLoadingPath, error: errorPath } = useQuery<Path | undefined, Error>({
     queryKey: ['path', pathId],
-    queryFn: ()_> getPathById(pathId!),
+    queryFn: () => getPathById(pathId!),
     enabled: !!pathId,
   });
 
