@@ -1,22 +1,7 @@
 
-export interface MasterGuide {
-  id: string;
-  name: string;
-  tradition: string;
-  category: "S" | "A" | "B" | "C"; // S=Avatars, A=Historical Masters, B=Mystics, C=Teachers
-  description: string;
-  period: string;
-  characteristics: string[];
-  teachings: string[];
-  missionTypes: string[];
-  icon: string;
-  quote?: string;
-  material?: string;
-  image?: string;
-  rarity?: string; // For display purposes
-}
+import { Master } from "@/types/master";
 
-export const masterGuides: MasterGuide[] = [
+export const masterGuides: Master[] = [ // Changed MasterGuide to Master
   // Categoria S (Avatares/Fundadores)
   {
     id: "jesus",
@@ -31,7 +16,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "✝️",
     quote: "Conhecereis a verdade, e a verdade vos libertará.",
     material: "Evangelhos canônicos e apócrifos, estudos sobre o Jesus histórico",
-    rarity: "Extremamente Raro"
+    rarity: "Extremamente Raro",
+    availableAt: 1, // Placeholder
+    missions: [], // Placeholder
+    specializations: [] // Placeholder
   },
   {
     id: "buda",
@@ -46,7 +34,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "☸️",
     quote: "A paz vem de dentro. Não a procure fora.",
     material: "Sutras budistas principais, biografias do Buda",
-    rarity: "Extremamente Raro"
+    rarity: "Extremamente Raro",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   {
     id: "hermes",
@@ -61,7 +52,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "⚕️",
     quote: "Como acima, assim é abaixo; como abaixo, assim é acima.",
     material: "Corpus Hermeticum, Caibalion, textos alquímicos",
-    rarity: "Extremamente Raro"
+    rarity: "Extremamente Raro",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   
   // Categoria A (Mestres Históricos Principais)
@@ -78,7 +72,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "☯️",
     quote: "Aquele que conhece os outros é sábio; aquele que conhece a si mesmo é iluminado.",
     material: "Tao Te Ching, textos taoistas complementares",
-    rarity: "Raro"
+    rarity: "Raro",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   {
     id: "teresa-avila",
@@ -93,7 +90,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "🕊️",
     quote: "A paciência tudo alcança.",
     material: "Obras completas, biografias, contexto histórico",
-    rarity: "Raro"
+    rarity: "Raro",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   {
     id: "rumi",
@@ -108,7 +108,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "☪️",
     quote: "O que procuras está procurando por você.",
     material: "Poemas de Rumi, biografia, contexto histórico",
-    rarity: "Raro"
+    rarity: "Raro",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   
   // Categoria B (Místicos e Ocultistas)
@@ -124,7 +127,10 @@ export const masterGuides: MasterGuide[] = [
     missionTypes: ["Estudo comparativo", "Decifração de símbolos", "Meditação teosófica"],
     icon: "🔮",
     material: "Obras principais, biografia, contexto histórico",
-    rarity: "Incomum"
+    rarity: "Incomum",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   {
     id: "carl-jung",
@@ -139,7 +145,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "🧠",
     quote: "Aquele que olha para fora, sonha; aquele que olha para dentro, desperta.",
     material: "Obras principais, Livro Vermelho, estudos junguianos",
-    rarity: "Incomum"
+    rarity: "Incomum",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   
   // Categoria C (Sábios e Instrutores)
@@ -155,7 +164,10 @@ export const masterGuides: MasterGuide[] = [
     missionTypes: ["Contemplação zen", "Questionamento filosófico", "Integração cultural"],
     icon: "📚",
     material: "Obras principais, gravações de palestras",
-    rarity: "Comum"
+    rarity: "Comum",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   {
     id: "thich-nhat-hanh",
@@ -170,7 +182,10 @@ export const masterGuides: MasterGuide[] = [
     icon: "🧘‍♂️",
     quote: "A paz está em cada passo. O objetivo é o próprio caminho.",
     material: "Obras principais, contexto histórico",
-    rarity: "Comum"
+    rarity: "Comum",
+    availableAt: 1,
+    missions: [],
+    specializations: []
   },
   {
     id: "ram-dass",
@@ -185,7 +200,281 @@ export const masterGuides: MasterGuide[] = [
     icon: "🧠",
     quote: "O único lugar onde você pode encontrar força é no momento presente.",
     material: "Obras principais, palestras, biografia",
-    rarity: "Comum"
+    rarity: "Comum",
+    availableAt: 1,
+    missions: [],
+    specializations: []
+  },
+  // Added Placeholder Masters
+  {
+    id: "unknown-moises",
+    name: "Moisés",
+    tradition: "Judaísmo/Cristianismo",
+    category: "A",
+    description: "Details to be added.",
+    period: "Antigo Testamento",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Comum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-dion-fortune",
+    name: "Dion Fortune",
+    tradition: "Esoterismo Ocidental",
+    category: "B",
+    description: "Details to be added.",
+    period: "Século XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Comum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-sao-francisco-de-assis",
+    name: "São Francisco de Assis",
+    tradition: "Cristianismo Místico",
+    category: "A",
+    description: "Details to be added.",
+    period: "Século XII-XIII",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Comum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-saint-germain",
+    name: "Saint Germain",
+    tradition: "Alquimia/Teosofia",
+    category: "A",
+    description: "Details to be added.",
+    period: "Século XVIII (lendário)",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Raro",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-krishna",
+    name: "Krishna",
+    tradition: "Hinduísmo",
+    category: "S",
+    description: "Details to be added.",
+    period: "Antigo",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Extremamente Raro",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-sri-aurobindo",
+    name: "Sri Aurobindo",
+    tradition: "Yoga Integral",
+    category: "A",
+    description: "Details to be added.",
+    period: "Século XIX-XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Raro",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-eliphas-levi",
+    name: "Eliphas Levi",
+    tradition: "Ocultismo",
+    category: "B",
+    description: "Details to be added.",
+    period: "Século XIX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Incomum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-joe-dispenza",
+    name: "Joe Dispenza",
+    tradition: "Ciência e Espiritualidade",
+    category: "C",
+    description: "Details to be added.",
+    period: "Contemporâneo",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Comum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-patanjali",
+    name: "Patanjali",
+    tradition: "Yoga",
+    category: "A",
+    description: "Details to be added.",
+    period: "Antigo",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Raro",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-paramahansa-yogananda",
+    name: "Paramahansa Yogananda",
+    tradition: "Kriya Yoga",
+    category: "A",
+    description: "Details to be added.",
+    period: "Século XIX-XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Raro",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-aleister-crowley",
+    name: "Aleister Crowley",
+    tradition: "Thelema",
+    category: "B",
+    description: "Details to be added.",
+    period: "Século XIX-XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Incomum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-rudolf-steiner",
+    name: "Rudolf Steiner",
+    tradition: "Antroposofia",
+    category: "B",
+    description: "Details to be added.",
+    period: "Século XIX-XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Incomum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-carlos-castaneda",
+    name: "Carlos Castaneda",
+    tradition: "Xamanismo (Yaqui)",
+    category: "C",
+    description: "Details to be added.",
+    period: "Século XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Comum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-jiddu-krishnamurti",
+    name: "Jiddu Krishnamurti",
+    tradition: "Filosofia Espiritual",
+    category: "A",
+    description: "Details to be added.",
+    period: "Século XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Raro",
+    availableAt: 0,
+    missions: [],
+    specializations: []
+  },
+  {
+    id: "unknown-gi-gurdjieff",
+    name: "G.I. Gurdjieff",
+    tradition: "Quarto Caminho",
+    category: "B",
+    description: "Details to be added.",
+    period: "Século XIX-XX",
+    characteristics: [],
+    teachings: [],
+    missionTypes: [],
+    icon: "❓",
+    quote: "",
+    material: "",
+    rarity: "Incomum",
+    availableAt: 0,
+    missions: [],
+    specializations: []
   }
 ];
 

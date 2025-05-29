@@ -5,34 +5,66 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/co
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { masterGuides } from "@/data/mastersData.expanded";
 import { Search, Filter, BookOpen, Users, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { getMasters } from "@/services/masterService";
+import { Master } from "@/types/master";
 
 const Masters = () => {
-  // Agrupamento por categoria
-  const mastersByCategory = {
-    "S": {
-      title: "Avatares e Fundadores",
-      masters: masterGuides.filter(master => master.category === "S"),
-      color: "bg-amber-500"
-    },
-    "A": {
-      title: "Mestres Históricos",
-      masters: masterGuides.filter(master => master.category === "A"),
-      color: "bg-primary"
-    },
-    "B": {
-      title: "Místicos e Professores",
-      masters: masterGuides.filter(master => master.category === "B"),
-      color: "bg-secondary"
-    },
-    "C": {
-      title: "Sábios e Instrutores",
-      masters: masterGuides.filter(master => master.category === "C"),
-      color: "bg-muted"
-    }
-  };
+  const { data: allMasters, isLoading, error } = useQuery<Master[], Error>({
+    queryKey: ['masters'],
+    queryFn: getMasters
+  });
+
+  const mastersByCategory = allMasters 
+    ? {
+        "S": {
+          title: "Avatares e Fundadores",
+          masters: allMasters.filter(master => master.category === "S"),
+          color: "bg-amber-500"
+        },
+        "A": {
+          title: "Mestres Históricos",
+          masters: allMasters.filter(master => master.category === "A"),
+          color: "bg-primary"
+        },
+        "B": {
+          title: "Místicos e Professores",
+          masters: allMasters.filter(master => master.category === "B"),
+          color: "bg-secondary"
+        },
+        "C": {
+          title: "Sábios e Instrutores",
+          masters: allMasters.filter(master => master.category === "C"),
+          color: "bg-muted"
+        }
+      }
+    : {};
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center">Loading masters...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center text-red-500">Error loading masters: {error.message}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -92,7 +124,10 @@ const Masters = () => {
           </div>
 
           {/* Mestres por Categoria */}
-          {Object.entries(mastersByCategory).map(([category, data]) => (
+          {Object.entries(mastersByCategory).map(([categoryKey, data]) => {
+            const category = categoryKey as keyof typeof mastersByCategory; // Type assertion
+            if (!data || !data.masters || data.masters.length === 0) return null; // Skip if no masters for this category
+            return (
             <section key={category} className="mb-16">
               <h2 className="font-heading text-2xl mb-6 flex items-center">
                 <span className={`inline-block w-3 h-3 rounded-full mr-2 ${data.color}`}></span>
@@ -103,8 +138,8 @@ const Masters = () => {
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {data.masters.map((master, index) => (
-                  <Card key={index} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
+                {data.masters.map((master) => (
+                  <Card key={master.id} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
                     <div className="h-48 bg-gradient-to-b from-primary/10 to-secondary/10 flex items-center justify-center">
                       <span className="text-5xl">{master.icon}</span>
                     </div>
@@ -133,13 +168,15 @@ const Masters = () => {
                         </div>
                       </div>
                       
-                      <Button variant="secondary" size="sm" className="w-full">Ver Detalhes</Button>
+                      <Link to={`/masters/${master.id}`} className="w-full">
+                        <Button variant="secondary" size="sm" className="w-full">Ver Detalhes</Button>
+                      </Link>
                     </div>
                   </Card>
                 ))}
               </div>
             </section>
-          ))}
+          )})}
 
           {/* Call to Action */}
           <div className="mt-16 text-center">

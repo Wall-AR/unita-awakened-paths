@@ -90,7 +90,7 @@ const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <Link to="/dashboard">
+                  <Link to="/my-courses">
                     <DropdownMenuItem>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span>Meus cursos</span>

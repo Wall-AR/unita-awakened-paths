@@ -5,9 +5,51 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Search, Filter, Clock, BookOpen, Award } from "lucide-react";
-import { courses } from "@/data/coursesData";
+import { useQuery } from "@tanstack/react-query";
+import { getCourses, getFeaturedCourses } from "@/services/courseService"; // Assuming getFeaturedCourses will be used
+import { Course } from "@/types/course";
 
+/**
+ * @page Courses
+ * @description This page displays a list of all available courses, including a featured course
+ * and filtering options. It fetches course data using the `courseService`.
+ */
 const Courses = () => {
+  const { data: allCourses, isLoading: isLoadingAllCourses, error: errorAllCourses } = useQuery<Course[], Error>({ 
+    queryKey: ['courses'], 
+    queryFn: getCourses 
+  });
+
+  // Example: If you want to fetch featured courses separately or derive them
+  // For this example, we'll filter from allCourses, but you could make a separate query
+  const featuredCourse = allCourses?.find(course => course.isFeatured);
+  const otherCourses = allCourses?.filter(course => !course.isFeatured);
+
+
+  if (isLoadingAllCourses) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center">Loading courses...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (errorAllCourses) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center text-red-500">Error loading courses: {errorAllCourses.message}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -72,57 +114,59 @@ const Courses = () => {
           </div>
 
           {/* Curso em Destaque */}
-          <section className="mb-16">
-            <h2 className="font-heading text-2xl mb-6">Em Destaque</h2>
-            <Card className="bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
-              <div className="md:flex">
-                <div className="md:w-2/5 h-64 md:h-auto bg-gradient-to-br from-primary/20 via-secondary/10 to-background">
-                  <div className="h-full w-full flex items-center justify-center p-12">
-                    <span className="text-7xl">{courses[0].icon}</span>
+          {featuredCourse && (
+            <section className="mb-16">
+              <h2 className="font-heading text-2xl mb-6">Em Destaque</h2>
+              <Card className="bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
+                <div className="md:flex">
+                  <div className="md:w-2/5 h-64 md:h-auto bg-gradient-to-br from-primary/20 via-secondary/10 to-background">
+                    <div className="h-full w-full flex items-center justify-center p-12">
+                      <span className="text-7xl">{featuredCourse.icon}</span>
+                    </div>
+                  </div>
+                  <div className="md:w-3/5 p-6">
+                    <div className="mb-4">
+                      <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-xs mr-2">{featuredCourse.tradition}</span>
+                      <span className="inline-block px-3 py-1 rounded-full bg-secondary/20 text-xs">Nível 1-4</span> {/* This level display might need adjustment based on actual data */}
+                    </div>
+                    <h3 className="font-heading text-2xl md:text-3xl mb-3">{featuredCourse.title}</h3>
+                    <p className="text-muted-foreground mb-6">{featuredCourse.description}</p>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-6">
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">{featuredCourse.duration}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <BookOpen className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">{featuredCourse.lessons} lições</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Award className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-sm">Certificado</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col xs:flex-row gap-4">
+                      <Button asChild>
+                        <Link to={`/courses/${featuredCourse.id}`}>Iniciar Curso</Link>
+                      </Button>
+                      <Button variant="outline" asChild>
+                        <Link to={`/courses/${featuredCourse.id}`}>Detalhes</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div className="md:w-3/5 p-6">
-                  <div className="mb-4">
-                    <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-xs mr-2">{courses[0].tradition}</span>
-                    <span className="inline-block px-3 py-1 rounded-full bg-secondary/20 text-xs">Nível 1-4</span>
-                  </div>
-                  <h3 className="font-heading text-2xl md:text-3xl mb-3">{courses[0].title}</h3>
-                  <p className="text-muted-foreground mb-6">{courses[0].description}</p>
-                  
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm">{courses[0].duration}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <BookOpen className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm">{courses[0].lessons} lições</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Award className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm">Certificado</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col xs:flex-row gap-4">
-                    <Button asChild>
-                      <Link to={`/courses/${courses[0].id}`}>Iniciar Curso</Link>
-                    </Button>
-                    <Button variant="outline" asChild>
-                      <Link to={`/courses/${courses[0].id}`}>Detalhes</Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </section>
+              </Card>
+            </section>
+          )}
 
           {/* Lista de Cursos */}
           <section className="mb-16">
             <h2 className="font-heading text-2xl mb-6">Cursos Disponíveis</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.slice(1).map((course, index) => (
-                <Card key={index} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
+              {otherCourses?.map((course) => (
+                <Card key={course.id} className="overflow-hidden bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
                   <div className="h-48 bg-gradient-to-br from-primary/10 via-secondary/5 to-background flex items-center justify-center">
                     <span className="text-5xl">{course.icon}</span>
                   </div>

@@ -1,0 +1,25 @@
+# Ignore artifacts:
+build
+dist
+coverage
+# Ignore vendor dependencies:
+node_modules
+# Ignore lock files
+package-lock.json
+bun.lockb
+yarn.lock
+# Ignore OS-specific files:
+.DS_Store
+Thumbs.db
+# Ignore IDE/editor specific files
+.idea/
+.vscode/
+# Ignore log files
+*.log
+# Ignore local env files
+.env*
+!/.env.example
+# Ignore specific file types if necessary, e.g.
+# *.svg
+# *.min.css
+# *.min.js

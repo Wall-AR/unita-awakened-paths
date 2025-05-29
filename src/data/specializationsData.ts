@@ -1,25 +1,5 @@
 
-export interface SpecializationPath {
-  id: string;
-  name: string;
-  description: string;
-  focus: string[];
-  development: string[];
-  attributes: string[];
-  recommendedCourses: string[];
-  affinityMasters: string[];
-  icon: string;
-  color: string;
-  dailyPractices?: DailyPractice[];
-}
-
-export interface DailyPractice {
-  id: string;
-  name: string;
-  description: string;
-  duration: string;
-  instructions: string;
-}
+import { SpecializationPath, DailyPractice } from "@/types/path";
 
 export const specializationPaths: SpecializationPath[] = [
   {
@@ -39,21 +19,24 @@ export const specializationPaths: SpecializationPath[] = [
         name: "Leitura Contemplativa",
         description: "Leia textos filosóficos ou espirituais com atenção plena, absorvendo seu significado profundo.",
         duration: "15-30 min",
-        instructions: "Escolha um parágrafo de uma obra filosófica, leia lentamente, pare para refletir sobre cada conceito importante. Anote insights."
+        instructions: "Escolha um parágrafo de uma obra filosófica, leia lentamente, pare para refletir sobre cada conceito importante. Anote insights.",
+        benefitsAttributes: [], // Added to conform to global type
       },
       {
         id: "philosophical-journaling",
         name: "Journaling Filosófico",
         description: "Registre suas reflexões filosóficas, questões existenciais e insights conceituais.",
         duration: "10-15 min",
-        instructions: "Formule uma pergunta filosófica no topo da página. Explore múltiplas perspectivas sobre ela. Conclua com sua visão atual."
+        instructions: "Formule uma pergunta filosófica no topo da página. Explore múltiplas perspectivas sobre ela. Conclua com sua visão atual.",
+        benefitsAttributes: [],
       },
       {
         id: "socratic-dialogue",
         name: "Diálogo Socrático",
         description: "Pratique o questionamento sistemático para explorar conceitos profundos.",
         duration: "15-30 min",
-        instructions: "Com um parceiro ou em diálogo interno, escolha um conceito e explore-o através de perguntas cada vez mais profundas."
+        instructions: "Com um parceiro ou em diálogo interno, escolha um conceito e explore-o através de perguntas cada vez mais profundas.",
+        benefitsAttributes: [],
       }
     ]
   },
@@ -74,21 +57,24 @@ export const specializationPaths: SpecializationPath[] = [
         name: "Meditação Silenciosa",
         description: "Aquiete a mente e mergulhe no silêncio interior para conectar-se com estados mais profundos de consciência.",
         duration: "20-40 min",
-        instructions: "Sente-se em posição confortável. Foque na respiração por 5 minutos. Depois, solte todo foco e repouse na consciência pura."
+        instructions: "Sente-se em posição confortável. Foque na respiração por 5 minutos. Depois, solte todo foco e repouse na consciência pura.",
+        benefitsAttributes: [],
       },
       {
         id: "mantra-recitation",
         name: "Recitação de Mantras",
         description: "Use sons sagrados para elevar a vibração da consciência e conectar-se com energias mais sutis.",
         duration: "10-15 min",
-        instructions: "Escolha um mantra significativo. Recite-o em voz alta por alguns minutos, depois sussurre e finalmente repita-o mentalmente."
+        instructions: "Escolha um mantra significativo. Recite-o em voz alta por alguns minutos, depois sussurre e finalmente repita-o mentalmente.",
+        benefitsAttributes: [],
       },
       {
         id: "sacred-symbol-contemplation",
         name: "Contemplação de Símbolos",
         description: "Use símbolos sagrados como pontos focais para meditação e expansão da consciência.",
         duration: "10-15 min",
-        instructions: "Selecione um símbolo sagrado. Olhe-o com atenção por alguns minutos. Feche os olhos e visualize-o internamente."
+        instructions: "Selecione um símbolo sagrado. Olhe-o com atenção por alguns minutos. Feche os olhos e visualize-o internamente.",
+        benefitsAttributes: [],
       }
     ]
   },
@@ -109,21 +95,24 @@ export const specializationPaths: SpecializationPath[] = [
         name: "Visualização Transformadora",
         description: "Use o poder da visualização criativa para transformar estados interiores.",
         duration: "15-20 min",
-        instructions: "Visualize uma qualidade indesejada como uma substância que se transforma gradualmente em uma qualidade desejada através de cores, luzes e símbolos."
+        instructions: "Visualize uma qualidade indesejada como uma substância que se transforma gradualmente em uma qualidade desejada através de cores, luzes e símbolos.",
+        benefitsAttributes: [],
       },
       {
         id: "subtle-energy-work",
         name: "Trabalho com Energia Sutil",
         description: "Trabalhe conscientemente com as energias sutis do corpo e da consciência.",
         duration: "15-20 min",
-        instructions: "Visualize e sinta a energia vital movendo-se através dos centros energéticos do corpo, purificando e elevando a vibração."
+        instructions: "Visualize e sinta a energia vital movendo-se através dos centros energéticos do corpo, purificando e elevando a vibração.",
+        benefitsAttributes: [],
       },
       {
         id: "dream-symbol-journal",
         name: "Registro de Sonhos e Símbolos",
         description: "Captura e interprete símbolos pessoais que emergem nos sonhos e na consciência.",
         duration: "10 min",
-        instructions: "Ao acordar, registre imediatamente os sonhos. Observe padrões, símbolos recorrentes e sensações emocionais associadas."
+        instructions: "Ao acordar, registre imediatamente os sonhos. Observe padrões, símbolos recorrentes e sensações emocionais associadas.",
+        benefitsAttributes: [],
       }
     ]
   },
@@ -144,21 +133,24 @@ export const specializationPaths: SpecializationPath[] = [
         name: "Meditação de Compaixão",
         description: "Desenvolva compaixão universal através de prática meditativa direcionada.",
         duration: "15-20 min",
-        instructions: "Comece gerando sentimentos de amor-bondade para si mesmo, depois para entes queridos, pessoas neutras, pessoas difíceis e finalmente todos os seres."
+        instructions: "Comece gerando sentimentos de amor-bondade para si mesmo, depois para entes queridos, pessoas neutras, pessoas difíceis e finalmente todos os seres.",
+        benefitsAttributes: [],
       },
       {
         id: "daily-service-act",
         name: "Ato Diário de Serviço",
         description: "Realize um ato de serviço desinteressado todos os dias.",
         duration: "variável",
-        instructions: "Identifique uma necessidade em seu ambiente e atenda-a sem esperar reconhecimento ou recompensa. Observe como isso afeta seu estado interior."
+        instructions: "Identifique uma necessidade em seu ambiente e atenda-a sem esperar reconhecimento ou recompensa. Observe como isso afeta seu estado interior.",
+        benefitsAttributes: [],
       },
       {
         id: "ethical-reflection",
         name: "Reflexão Ética Aplicada",
         description: "Examine suas ações diárias através de princípios éticos elevados.",
         duration: "10 min",
-        instructions: "Revise suas ações do dia à luz de princípios éticos como não-violência, verdade, generosidade. Identifique áreas para melhoria."
+        instructions: "Revise suas ações do dia à luz de princípios éticos como não-violência, verdade, generosidade. Identifique áreas para melhoria.",
+        benefitsAttributes: [],
       }
     ]
   },
@@ -179,21 +171,24 @@ export const specializationPaths: SpecializationPath[] = [
         name: "Estudo de Símbolos ou Textos",
         description: "Estude profundamente símbolos sagrados ou textos espirituais, explorando suas múltiplas camadas.",
         duration: "20-30 min",
-        instructions: "Escolha um símbolo ou passagem curta. Analise seu significado literal, alegórico, simbólico e místico. Registre insights em cada nível."
+        instructions: "Escolha um símbolo ou passagem curta. Analise seu significado literal, alegórico, simbólico e místico. Registre insights em cada nível.",
+        benefitsAttributes: [],
       },
       {
         id: "inspired-writing",
         name: "Escrita Inspirada",
         description: "Pratique a escrita em estado receptivo, permitindo que significados mais profundos fluam através de você.",
         duration: "15 min",
-        instructions: "Aquiete a mente por alguns minutos. Estabeleça uma intenção clara para receber sabedoria. Escreva continuamente, sem julgar ou editar o conteúdo."
+        instructions: "Aquiete a mente por alguns minutos. Estabeleça uma intenção clara para receber sabedoria. Escreva continuamente, sem julgar ou editar o conteúdo.",
+        benefitsAttributes: [],
       },
       {
         id: "connecting-concepts",
         name: "Conexão de Conceitos",
         description: "Pratique encontrar conexões entre conceitos aparentemente não relacionados em diferentes tradições.",
         duration: "15 min",
-        instructions: "Escolha dois conceitos de tradições diferentes. Explore suas similaridades, diferenças e princípios subjacentes comuns."
+        instructions: "Escolha dois conceitos de tradições diferentes. Explore suas similaridades, diferenças e princípios subjacentes comuns.",
+        benefitsAttributes: [],
       }
     ]
   }

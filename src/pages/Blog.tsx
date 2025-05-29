@@ -5,9 +5,44 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/co
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { blogPosts } from "@/data/blogData";
+import { useQuery } from "@tanstack/react-query";
+import { getBlogPosts } from "@/services/blogService";
+import { BlogPost } from "@/types/blog";
 
 const Blog = () => {
+  const { data: posts, isLoading, error } = useQuery<BlogPost[], Error>({
+    queryKey: ['blogPosts'],
+    queryFn: getBlogPosts
+  });
+
+  // Assuming the first post is featured, or implement specific logic if available (e.g., an isFeatured flag)
+  const featuredPost = posts?.[0];
+  const recentPosts = posts?.slice(1);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center">Loading blog posts...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center text-red-500">Error loading blog posts: {error.message}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -33,46 +68,51 @@ const Blog = () => {
           </p>
 
           {/* Post em destaque */}
-          <div className="mb-16">
-            <h2 className="font-heading text-2xl mb-6">Em Destaque</h2>
-            <Card className="bg-card/30 backdrop-blur-sm border border-border/50">
-              <div className="md:flex">
-                <div className="md:w-2/5 h-64 md:h-auto bg-primary/10 rounded-t-lg md:rounded-l-lg md:rounded-tr-none">
-                  <div className="h-full w-full flex items-center justify-center">
-                    <span className="text-4xl">✦</span>
+          {featuredPost && (
+            <div className="mb-16">
+              <h2 className="font-heading text-2xl mb-6">Em Destaque</h2>
+              <Card className="bg-card/30 backdrop-blur-sm border border-border/50">
+                <div className="md:flex">
+                  <div className="md:w-2/5 h-64 md:h-auto bg-primary/10 rounded-t-lg md:rounded-l-lg md:rounded-tr-none">
+                    <div className="h-full w-full flex items-center justify-center">
+                      {/* Using icon from featured post if available */}
+                      <span className="text-4xl">{featuredPost.icon || '✦'}</span>
+                    </div>
+                  </div>
+                  <div className="md:w-3/5 p-6">
+                    <CardHeader className="p-0 pb-4">
+                      <div className="mb-2">
+                        <span className="inline-block px-3 py-1 bg-primary/20 rounded-full text-xs">{featuredPost.category}</span>
+                      </div>
+                      <CardTitle className="text-2xl md:text-3xl font-heading">
+                        {featuredPost.title}
+                      </CardTitle>
+                      <CardDescription className="mt-2">
+                        Por {featuredPost.author} • {featuredPost.date}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0 pb-6">
+                      <p className="text-muted-foreground">
+                        {featuredPost.excerpt}
+                      </p>
+                    </CardContent>
+                    <CardFooter className="p-0">
+                      <Button variant="secondary" asChild>
+                        <Link to={`/blog/${featuredPost.slug}`}>Ler Artigo</Link>
+                      </Button>
+                    </CardFooter>
                   </div>
                 </div>
-                <div className="md:w-3/5 p-6">
-                  <CardHeader className="p-0 pb-4">
-                    <div className="mb-2">
-                      <span className="inline-block px-3 py-1 bg-primary/20 rounded-full text-xs">Hermetismo</span>
-                    </div>
-                    <CardTitle className="text-2xl md:text-3xl font-heading">
-                      As Sete Leis Herméticas e sua Aplicação na Vida Moderna
-                    </CardTitle>
-                    <CardDescription className="mt-2">
-                      Por Sofia Luz • 12 de Abril de 2025
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-0 pb-6">
-                    <p className="text-muted-foreground">
-                      Como os princípios ancestrais do Caibalion podem transformar nossa compreensão da realidade e oferecer ferramentas práticas para navegar os desafios contemporâneos.
-                    </p>
-                  </CardContent>
-                  <CardFooter className="p-0">
-                    <Button variant="secondary">Ler Artigo</Button>
-                  </CardFooter>
-                </div>
-              </div>
-            </Card>
-          </div>
+              </Card>
+            </div>
+          )}
 
           {/* Posts recentes */}
           <div className="mb-16">
             <h2 className="font-heading text-2xl mb-6">Artigos Recentes</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogPosts.map((post, index) => (
-                <Card key={index} className="bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
+              {recentPosts?.map((post) => (
+                <Card key={post.id} className="bg-card/30 backdrop-blur-sm border border-border/50 hover:border-primary/30 transition-all duration-300">
                   <div className="h-48 bg-primary/10 rounded-t-lg flex items-center justify-center">
                     <span className="text-3xl">{post.icon}</span>
                   </div>
@@ -87,7 +127,9 @@ const Blog = () => {
                     <p className="text-muted-foreground text-sm">{post.excerpt}</p>
                   </CardContent>
                   <CardFooter>
-                    <Button variant="outline">Ler Artigo</Button>
+                    <Button variant="outline" asChild>
+                      <Link to={`/blog/${post.slug}`}>Ler Artigo</Link>
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}

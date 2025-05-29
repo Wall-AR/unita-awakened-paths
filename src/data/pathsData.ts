@@ -1,19 +1,9 @@
 
-export interface Path {
-  name: string;
-  description: string;
-  icon: string;
-  gradient: {
-    from: string;
-    to: string;
-  };
-  keyElements: string[];
-  masters: string[];
-  courses?: string[];
-}
+import { Path } from "@/types/path";
 
 export const paths: Path[] = [
   {
+    id: "tradicao-abrahamica", // Added ID
     name: "Tradição Abraâmica",
     description: "Explore os ensinamentos e práticas espirituais das tradições judaica, cristã e islâmica, revelando sua sabedoria ancestral e mística.",
     icon: "✝️",
@@ -27,21 +17,22 @@ export const paths: Path[] = [
       "Misticismo Cristão Medieval",
       "Sufismo e Sabedoria Islâmica"
     ],
-    masters: [
-      "Jesus Cristo",
-      "Moisés",
-      "São Francisco de Assis",
-      "Teresa de Ávila",
-      "Rumi"
+    masterIds: [ 
+      "jesus",
+      "unknown-moises",
+      "unknown-sao-francisco-de-assis",
+      "teresa-avila",
+      "rumi"
     ],
-    courses: [
-      "A Bíblia Revelada: Para Além do Véu",
-      "A Cabala Mística: A Árvore da Vida",
-      "Misticismo Cristão: De Jesus aos Místicos Medievais",
-      "Sufismo: O Caminho do Coração"
+    courseIds: [ 
+      "biblia-revelada",
+      "cabala-mistica",
+      "misticismo-cristao",
+      "sufismo"
     ]
   },
   {
+    id: "tradicao-hermetica", // Added ID
     name: "Tradição Hermética",
     description: "Baseado nos princípios universais do Corpus Hermeticum e do Caibalion, revelando as leis que governam o cosmos e a consciência.",
     icon: "⚕️",
@@ -55,18 +46,19 @@ export const paths: Path[] = [
       "Estudo do Caibalion",
       "Meditação sobre os Princípios"
     ],
-    masters: [
-      "Hermes Trismegisto",
-      "Saint Germain",
-      "Eliphas Levi"
+    masterIds: [
+      "hermes",
+      "unknown-saint-germain",
+      "unknown-eliphas-levi"
     ],
-    courses: [
-      "O Caibalion: Os Sete Princípios Herméticos",
-      "Alquimia Ocidental: Da Matéria ao Espírito",
-      "A Tábua de Esmeralda e seus Segredos"
+    courseIds: [
+      "caibalion",
+      "alquimia-ocidental",
+      "tabua-esmeralda"
     ]
   },
   {
+    id: "tradicao-oriental", // Added ID
     name: "Tradição Oriental",
     description: "Explore as profundas tradições espirituais da Ásia, incluindo as práticas contemplativas e filosóficas da Índia, China e Japão.",
     icon: "☸️",
@@ -80,21 +72,22 @@ export const paths: Path[] = [
       "Taoísmo e Harmonia Natural",
       "Zen e Não-dualidade"
     ],
-    masters: [
-      "Buda",
-      "Lao Tsé",
-      "Patanjali",
-      "Paramahansa Yogananda",
-      "Thich Nhat Hanh"
+    masterIds: [
+      "buda",
+      "lao-tse",
+      "unknown-patanjali",
+      "unknown-paramahansa-yogananda",
+      "thich-nhat-hanh"
     ],
-    courses: [
-      "A Voz do Silêncio: Sabedoria Além das Palavras",
-      "Vedanta: O Conhecimento Supremo",
-      "Tao Te Ching: O Caminho do Meio",
-      "Zen: Além da Mente Dualista"
+    courseIds: [
+      "voz-silencio",
+      "vedanta",
+      "tao-te-ching",
+      "unknown-zen-alem-da-mente-dualista" 
     ]
   },
   {
+    id: "tradicao-egipcia", // Added ID
     name: "Tradição Egípcia",
     description: "Explore os antigos mistérios do Egito, seus rituais de iniciação e a sabedoria codificada em seus textos sagrados e monumentos.",
     icon: "☥",
@@ -108,15 +101,16 @@ export const paths: Path[] = [
       "Mitologia e Deuses Egípcios",
       "Simbolismo Hieroglífico"
     ],
-    masters: [
-      "Hermes Trismegisto"
+    masterIds: [
+      "hermes"
     ],
-    courses: [
-      "O Livro dos Mortos: Jornada da Alma",
-      "Mitos e Mistérios do Antigo Egito"
+    courseIds: [
+      "livro-mortos",
+      "unknown-mitos-misterios-egito" 
     ]
   },
   {
+    id: "tradicao-ocidental-moderna", // Added ID
     name: "Tradição Ocidental Moderna",
     description: "Estuda as escolas esotéricas modernas que surgiram nos séculos XIX e XX, integrando conhecimento antigo com novas perspectivas.",
     icon: "🔮",
@@ -130,20 +124,21 @@ export const paths: Path[] = [
       "Rosacrucianismo",
       "Psicologia Profunda"
     ],
-    masters: [
-      "Helena Blavatsky",
-      "Aleister Crowley",
-      "Rudolf Steiner",
-      "Carl Jung",
-      "Dion Fortune"
+    masterIds: [
+      "helena-blavatsky",
+      "unknown-aleister-crowley",
+      "unknown-rudolf-steiner",
+      "carl-jung",
+      "unknown-dion-fortune"
     ],
-    courses: [
-      "Dogma e Ritual da Alta Magia",
-      "Teosofia: A Sabedoria Divina",
-      "Rosacrucianismo: O Caminho da Rosa e da Cruz"
+    courseIds: [
+      "dogma-ritual",
+      "unknown-teosofia-sabedoria-divina", 
+      "unknown-rosacrucianismo-caminho" 
     ]
   },
   {
+    id: "tradicao-xamanica-paga", // Added ID
     name: "Tradição Xamânica e Pagã",
     description: "Explora as antigas práticas xamânicas e tradições pagãs focadas na conexão com a natureza e estados alterados de consciência.",
     icon: "🌿",
@@ -157,15 +152,16 @@ export const paths: Path[] = [
       "Rituais Sazonais",
       "Conexão com Espíritos da Natureza"
     ],
-    masters: [
-      "Carlos Castaneda"
+    masterIds: [
+      "unknown-carlos-castaneda"
     ],
-    courses: [
-      "A Cozinha da Bruxa: Ervas e Rituais",
-      "Xamanismo Global: Técnicas de Êxtase"
+    courseIds: [
+      "unknown-cozinha-bruxa", 
+      "unknown-xamanismo-global" 
     ]
   },
   {
+    id: "caminhos-integradores", // Added ID
     name: "Caminhos Integradores",
     description: "Abordagens que sintetizam múltiplas tradições e integram ciência contemporânea com sabedoria ancestral para uma visão holística.",
     icon: "🔄",
@@ -179,16 +175,16 @@ export const paths: Path[] = [
       "Simbolismo Universal",
       "Estados de Consciência"
     ],
-    masters: [
-      "Carl Jung",
-      "Ram Dass",
-      "Jiddu Krishnamurti",
-      "G.I. Gurdjieff"
+    masterIds: [
+      "carl-jung",
+      "ram-dass",
+      "unknown-jiddu-krishnamurti",
+      "unknown-gi-gurdjieff"
     ],
-    courses: [
-      "Como se Tornar Sobrenatural: Integrando Ciência e Espiritualidade",
-      "Símbolos Universais: A Linguagem do Inconsciente Coletivo",
-      "Mapeando a Consciência: Estados Alterados e Expansão da Mente"
+    courseIds: [
+      "sobrenatural",
+      "unknown-simbolos-universais", 
+      "unknown-mapeando-consciencia" 
     ]
   }
 ];

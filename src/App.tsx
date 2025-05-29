@@ -23,10 +23,15 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import CourseDetail from "./pages/CourseDetail";
+import MasterDetail from "./pages/MasterDetail";
+import BlogPostDetail from "./pages/BlogPostDetail";
 import MissionDetail from "./pages/MissionDetail";
+import PathDetail from "./pages/PathDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import MyCourses from "./pages/MyCourses";
+import AchievementsPage from "./pages/AchievementsPage";
 
 const queryClient = new QueryClient();
 
@@ -54,21 +59,34 @@ const App = () => (
                     <Profile />
                   </ProtectedRoute>
                 } />
+                <Route path="/profile/achievements" element={
+                  <ProtectedRoute>
+                    <AchievementsPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <Settings />
                   </ProtectedRoute>
                 } />
+                <Route path="/my-courses" element={
+                  <ProtectedRoute>
+                    <MyCourses />
+                  </ProtectedRoute>
+                } />
                 <Route path="/paths" element={<Paths />} />
+                <Route path="/paths/:pathId" element={<PathDetail />} />
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/courses/:courseId" element={<CourseDetail />} />
                 <Route path="/masters" element={<Masters />} />
+                <Route path="/masters/:masterId" element={<MasterDetail />} />
                 <Route path="/missions" element={<Missions />} />
                 <Route path="/missions/:missionId" element={<MissionDetail />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPostDetail />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />

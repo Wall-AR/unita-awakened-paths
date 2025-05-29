@@ -2,6 +2,9 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Award } from "lucide-react";
 
 const UserProgressCard = () => {
   // Mock data - será substituído por dados reais do usuário
@@ -51,6 +54,15 @@ const UserProgressCard = () => {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="mt-6">
+            <Button variant="outline" size="sm" className="w-full" asChild>
+              <Link to="/profile/achievements">
+                <Award className="mr-2 h-4 w-4" />
+                Ver Todas as Conquistas
+              </Link>
+            </Button>
           </div>
         </div>
       </CardContent>
