@@ -1,9 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCourses } from "@/services/courseService";
 import type { Course } from "@/types";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { Header } from "@/components/Header"; 
+import { Footer } from "@/components/Footer"; 
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"; // Corrected import for shadcn/ui
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -73,7 +80,19 @@ const MyCourses = () => {
     <>
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <Breadcrumb items={breadcrumbItems} />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/">Início</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Meus Cursos</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <h1 className="text-3xl font-bold my-6">Meus Cursos</h1>
 
         {enrolledCourses.length === 0 && !isLoading && (

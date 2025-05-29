@@ -7,9 +7,16 @@ import { Lock } from "lucide-react"; // Added
 import { getCourses } from "@/services/courseService"; // Fetch all and filter
 import { getMasters } from "@/services/masterService"; // Fetch all and filter
 import type { Path, Course, Master } from "@/types";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { Header } from "@/components/Header"; 
+import { Footer } from "@/components/Footer"; 
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"; // Corrected import for shadcn/ui
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 // import { Badge } from "@/components/ui/badge"; // Replaced by AccessBadge where appropriate
@@ -74,7 +81,25 @@ const PathDetail = () => {
     <>
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <Breadcrumb items={breadcrumbItems} />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/">Início</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/paths">Caminhos</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{path.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <header className="my-8 text-center">
           <div className="mb-4 inline-flex items-center justify-center rounded-full p-3" style={{ background: path.gradient?.from, backgroundImage: `linear-gradient(to right, ${path.gradient?.from}, ${path.gradient?.to})` }}>
