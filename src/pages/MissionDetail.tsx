@@ -1,23 +1,79 @@
 
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { missions } from "@/data/missionsData";
-import { masterGuides } from "@/data/mastersData.expanded";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getMissionById } from "@/services/missionService";
+import { getMasterById } from "@/services/masterService";
+import { Mission, MissionStep, MissionVerification } from "@/types/mission";
+import { Master } from "@/types/master";
+
 
 const MissionDetail = () => {
   const { missionId } = useParams<{ missionId: string }>();
+  const [activeTab, setActiveTab] = useState("modules"); // Although not used here, kept for consistency if tabs were added
+
+  const { data: mission, isLoading: isLoadingMission, error: errorMission } = useQuery<Mission | undefined, Error>({
+    queryKey: ['mission', missionId],
+    queryFn: () => getMissionById(missionId!),
+    enabled: !!missionId,
+  });
+
+  const { data: master, isLoading: isLoadingMaster, error: errorMaster } = useQuery<Master | undefined, Error>({
+    queryKey: ['master', mission?.masterId],
+    queryFn: () => getMasterById(mission?.masterId!),
+    enabled: !!mission?.masterId, // Only run if mission and mission.masterId are available
+  });
   
-  // Encontrar a missão pelo ID
-  const mission = missions.find((m) => m.id === missionId);
+  // Mock de progresso da missão (seria carregado de um estado real do usuário)
+  // This state should ideally be managed by a custom hook or global state if it needs to persist
+  const [completedSteps, setCompletedSteps] = useState<Record<string, boolean>>({});
   
-  // Se não encontrar a missão
+  const progress = mission?.steps 
+    ? (Object.values(completedSteps).filter(Boolean).length / mission.steps.length) * 100
+    : 0;
+  
+  // Toggle para completar um passo
+  const toggleStep = (stepId: string) => {
+    setCompletedSteps(prev => ({
+      ...prev,
+      [stepId]: !prev[stepId]
+    }));
+  };
+
+  if (isLoadingMission || isLoadingMaster) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16 pb-12">
+          <div className="container mx-auto px-4 py-12 text-center">Loading mission details...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (errorMission || errorMaster) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16 pb-12">
+          <div className="container mx-auto px-4 py-12 text-center text-red-500">
+            {errorMission && <p>Error loading mission: {errorMission.message}</p>}
+            {errorMaster && <p>Error loading master: {errorMaster.message}</p>}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
   if (!mission) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -32,21 +88,6 @@ const MissionDetail = () => {
       </div>
     );
   }
-  
-  // Encontrar o mestre da missão
-  const master = masterGuides.find((m) => m.id === mission.masterId);
-  
-  // Mock de progresso da missão (seria carregado de um estado real do usuário)
-  const [completedSteps, setCompletedSteps] = useState<Record<number, boolean>>({});
-  const progress = Object.values(completedSteps).filter(Boolean).length / mission.steps.length * 100;
-  
-  // Toggle para completar um passo
-  const toggleStep = (stepIndex: number) => {
-    setCompletedSteps(prev => ({
-      ...prev,
-      [stepIndex]: !prev[stepIndex]
-    }));
-  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -138,15 +179,15 @@ const MissionDetail = () => {
                   </div>
                   
                   <ul className="space-y-3">
-                    {mission.steps.map((step, idx) => (
-                      <li key={idx}>
+                    {mission.steps.map((step: MissionStep) => (
+                      <li key={step.id}>
                         <div className="flex items-center gap-3">
                           <Checkbox 
-                            checked={!!completedSteps[idx]}
-                            onCheckedChange={() => toggleStep(idx)}
+                            checked={!!completedSteps[step.id]}
+                            onCheckedChange={() => toggleStep(step.id)}
                           />
-                          <span className={completedSteps[idx] ? "line-through text-muted-foreground" : ""}>
-                            {step}
+                          <span className={completedSteps[step.id] ? "line-through text-muted-foreground" : ""}>
+                            {step.description}
                           </span>
                         </div>
                       </li>
@@ -164,17 +205,26 @@ const MissionDetail = () => {
                   </p>
                   
                   <ul className="space-y-4">
-                    {mission.verification.map((item, idx) => (
-                      <li key={idx} className="p-3 border border-border/50 rounded-lg">
-                        <h3 className="font-medium mb-1">{item}</h3>
-                        <div className="mt-2">
+                    {mission.verification.map((item: MissionVerification) => (
+                      <li key={item.id} className="p-3 border border-border/50 rounded-lg">
+                        <h3 className="font-medium mb-1">{item.description}</h3>
+                        {/* Basic file upload / text input example - actual implementation would be more complex */}
+                        {item.type === 'text' && <textarea className="w-full p-2 border rounded bg-background/50" placeholder="Sua resposta aqui..." rows={3}></textarea>}
+                        {(item.type === 'image' || item.type === 'audio' || item.type === 'video') && <input type="file" className="text-sm" />}
+                        {item.type === 'checklist' && item.checklistItems?.map((checkItem, cIdx) => (
+                          <div key={cIdx} className="flex items-center gap-2 mt-1">
+                            <Checkbox id={`${item.id}-check-${cIdx}`} />
+                            <label htmlFor={`${item.id}-check-${cIdx}`} className="text-sm">{checkItem}</label>
+                          </div>
+                        ))}
+                        {/* <div className="mt-2">
                           <Button variant="outline" size="sm" className="mr-2">
                             Carregar Arquivo
                           </Button>
                           <Button variant="outline" size="sm">
                             Adicionar Texto
                           </Button>
-                        </div>
+                        </div> */}
                       </li>
                     ))}
                   </ul>
@@ -209,12 +259,14 @@ const MissionDetail = () => {
                     )}
                     
                     <div className="mt-4 text-right">
-                      <Link 
+                      {/* Link to master detail page (not implemented yet) */}
+                      {/* <Link 
                         to={`/masters/${master.id}`}
                         className="text-sm text-primary hover:underline"
                       >
                         Ver perfil do mestre
-                      </Link>
+                      </Link> */}
+                       <Button variant="link" size="sm" className="p-0 h-auto">Ver perfil do mestre</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -241,7 +293,7 @@ const MissionDetail = () => {
                     
                     <div className="flex justify-between text-sm">
                       <span>Vence em:</span>
-                      <span>7 dias</span>
+                      <span>{mission.duration}</span>
                     </div>
                     
                     <div className="flex justify-between text-sm">

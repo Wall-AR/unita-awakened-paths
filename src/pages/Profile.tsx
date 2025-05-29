@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Award, ChevronRight } from 'lucide-react';
 import { 
   Card, 
   CardContent, 
@@ -17,6 +17,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -63,10 +64,11 @@ const Profile = () => {
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-heading mb-8">Perfil do Usuário</h1>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle>Seu Avatar</CardTitle>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"> {/* Added items-start for alignment */}
+              <div className="col-span-1 space-y-8"> {/* Wrapper div for left column cards */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Seu Avatar</CardTitle>
                   <CardDescription>Como você aparece na comunidade</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center py-6">
@@ -80,10 +82,27 @@ const Profile = () => {
                     <p className="text-muted-foreground text-sm">{email}</p>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-center">
-                  <Button variant="outline" disabled>Alterar Imagem</Button>
-                </CardFooter>
-              </Card>
+                  <CardFooter className="flex justify-center">
+                    <Button variant="outline" disabled>Alterar Imagem</Button>
+                  </CardFooter>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Minhas Conquistas</CardTitle>
+                    <CardDescription>Acompanhe seu progresso e medalhas.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full justify-start">
+                      <Link to="/profile/achievements">
+                        <Award className="mr-2 h-5 w-5 text-primary" />
+                        Ver Conquistas
+                        <ChevronRight className="ml-auto h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
               
               <Card className="col-span-1 lg:col-span-2">
                 <form onSubmit={handleSubmit}>

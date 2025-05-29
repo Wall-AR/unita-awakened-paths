@@ -5,11 +5,50 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/co
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { paths } from "@/data/pathsData";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { getPaths, getSpecializationPaths } from "@/services/pathService";
+import { Path, SpecializationPath } from "@/types/path";
 
 const Paths = () => {
+  const { data: pathsData, isLoading: isLoadingPaths, error: errorPaths } = useQuery<Path[], Error>({
+    queryKey: ['paths'],
+    queryFn: getPaths
+  });
+
+  const { data: specializationPathsData, isLoading: isLoadingSpecializations, error: errorSpecializations } = useQuery<SpecializationPath[], Error>({
+    queryKey: ['specializationPaths'],
+    queryFn: getSpecializationPaths
+  });
+
+  if (isLoadingPaths || isLoadingSpecializations) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center">Loading paths information...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (errorPaths || errorSpecializations) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center text-red-500">
+            {errorPaths && <p>Error loading paths: {errorPaths.message}</p>}
+            {errorSpecializations && <p>Error loading specializations: {errorSpecializations.message}</p>}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -51,9 +90,9 @@ const Paths = () => {
 
           {/* Grid de Caminhos */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {paths.map((path, index) => (
+            {pathsData?.map((path) => (
               <div 
-                key={index} 
+                key={path.id} 
                 className="path-card"
                 style={{
                   background: `linear-gradient(to bottom right, ${path.gradient.from}, ${path.gradient.to})`
@@ -71,22 +110,25 @@ const Paths = () => {
                   ))}
                 </ul>
                 <div className="mt-2 mb-4 flex flex-wrap gap-2">
-                  {path.courses && path.courses.slice(0, 2).map((course, i) => (
+                  {path.courseIds && path.courseIds.slice(0, 2).map((courseId, i) => ( // Assuming courseIds are present
                     <Badge key={i} variant="outline" className="bg-white/10">
-                      {course}
+                      {/* Ideally, fetch course title by ID here or pass richer data */}
+                      Curso ID: {courseId} 
                     </Badge>
                   ))}
-                  {path.courses && path.courses.length > 2 && (
+                  {path.courseIds && path.courseIds.length > 2 && (
                     <Badge variant="outline" className="bg-white/10">
-                      +{path.courses.length - 2} cursos
+                      +{path.courseIds.length - 2} cursos
                     </Badge>
                   )}
                 </div>
                 <div className="mt-auto">
-                  <Button variant="secondary" size="sm" className="w-full">
-                    Explorar Caminho
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </Button>
+                  <Link to={`/paths/${path.id}`} className="w-full">
+                    <Button variant="secondary" size="sm" className="w-full">
+                      Explorar Caminho
+                      <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -97,31 +139,23 @@ const Paths = () => {
             <h2 className="font-heading text-3xl mb-8">Especializações Espirituais</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="bg-card/30 backdrop-blur-sm border border-border/50 p-6 hover:border-blue-500/30 transition-all duration-300">
-                <div className="text-4xl mb-4 text-blue-400">📚</div>
-                <h3 className="font-heading text-xl mb-2">O Caminho do Filósofo</h3>
-                <p className="text-muted-foreground text-sm mb-4">Para aqueles que buscam compreender a verdade através do conhecimento intelectual e da análise racional.</p>
-                <Button variant="outline" size="sm">Detalhes</Button>
-              </Card>
-              
-              <Card className="bg-card/30 backdrop-blur-sm border border-border/50 p-6 hover:border-purple-500/30 transition-all duration-300">
-                <div className="text-4xl mb-4 text-purple-400">🕊️</div>
-                <h3 className="font-heading text-xl mb-2">O Caminho do Místico</h3>
-                <p className="text-muted-foreground text-sm mb-4">Para aqueles que buscam a experiência direta e pessoal da realidade divina, através da contemplação.</p>
-                <Button variant="outline" size="sm">Detalhes</Button>
-              </Card>
-              
-              <Card className="bg-card/30 backdrop-blur-sm border border-border/50 p-6 hover:border-amber-500/30 transition-all duration-300">
-                <div className="text-4xl mb-4 text-amber-400">⚗️</div>
-                <h3 className="font-heading text-xl mb-2">O Caminho do Alquimista</h3>
-                <p className="text-muted-foreground text-sm mb-4">Para aqueles que buscam a transformação interior através do trabalho com energias sutis e integração.</p>
-                <Button variant="outline" size="sm">Detalhes</Button>
-              </Card>
+              {specializationPathsData?.slice(0,3).map(specPath => ( // Display first 3 for brevity
+                 <Card key={specPath.id} className={`bg-card/30 backdrop-blur-sm border border-border/50 p-6 hover:border-${specPath.color}-500/30 transition-all duration-300`}>
+                  <div className={`text-4xl mb-4 text-${specPath.color}-400`}>{specPath.icon}</div>
+                  <h3 className="font-heading text-xl mb-2">{specPath.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-4">{specPath.description}</p>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={`/paths/${specPath.id}`}>Detalhes</Link>
+                  </Button>
+                </Card>
+              ))}
             </div>
             
-            <div className="flex justify-center mt-6">
-              <Button variant="ghost">Ver todas as especializações</Button>
-            </div>
+            {specializationPathsData && specializationPathsData.length > 3 && (
+              <div className="flex justify-center mt-6">
+                <Button variant="ghost">Ver todas as especializações</Button>
+              </div>
+            )}
           </section>
 
           {/* Call to Action */}

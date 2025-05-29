@@ -9,14 +9,49 @@ import CourseInformation from "@/components/courses/CourseInformation";
 import CourseActions from "@/components/courses/CourseActions";
 import RelatedCourses from "@/components/courses/RelatedCourses";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { courses } from "@/data/coursesData";
+import { useQuery } from "@tanstack/react-query";
+import { getCourseById } from "@/services/courseService";
+import { Course } from "@/types/course";
 
+/**
+ * @page CourseDetail
+ * @description Displays detailed information about a specific course, including its modules,
+ * general information, and actions related to the course. It fetches course data based on the ID
+ * from the URL parameters.
+ */
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const [activeTab, setActiveTab] = useState("modules");
+
+  const { data: course, isLoading, error } = useQuery<Course | undefined, Error>({
+    queryKey: ['course', courseId],
+    queryFn: () => getCourseById(courseId!), // Non-null assertion as courseId should be present
+    enabled: !!courseId, // Only run query if courseId is available
+  });
   
-  // Encontrar o curso pelo ID
-  const course = courses.find((c) => c.id === courseId);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16 pb-12">
+          <div className="container mx-auto px-4 py-12 text-center">Loading course details...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16 pb-12">
+          <div className="container mx-auto px-4 py-12 text-center text-red-500">Error loading course: {error.message}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
   
   if (!course) {
     return (

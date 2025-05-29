@@ -6,8 +6,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { missions } from "@/data/missionsData";
-import { masterGuides } from "@/data/mastersData.expanded";
+import { useQuery } from "@tanstack/react-query";
+import { getMissions } from "@/services/missionService";
+import { getMasters } from "@/services/masterService"; // To fetch master details
+import { Mission } from "@/types/mission";
+import { Master } from "@/types/master";
 import { 
   BookOpen, Clock, CheckCircle, Star, 
   AlarmClock, Medal, Lightbulb, Flame, Hand, 
@@ -15,9 +18,19 @@ import {
 } from "lucide-react";
 
 const Missions = () => {
+  const { data: missionsData, isLoading: isLoadingMissions, error: errorMissions } = useQuery<Mission[], Error>({
+    queryKey: ['missions'],
+    queryFn: getMissions
+  });
+
+  const { data: mastersData, isLoading: isLoadingMasters, error: errorMasters } = useQuery<Master[], Error>({
+    queryKey: ['masters'],
+    queryFn: getMasters // Fetch all masters to easily find them by ID
+  });
+
   // Encontrando os mestres relacionados
   const getMaster = (masterId: string) => {
-    return masterGuides.find(master => master.id === masterId);
+    return mastersData?.find(master => master.id === masterId);
   };
 
   // Ícones por tipo de missão
@@ -58,6 +71,33 @@ const Missions = () => {
       default: return type;
     }
   };
+
+  if (isLoadingMissions || isLoadingMasters) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center">Loading missions...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (errorMissions || errorMasters) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8 text-center text-red-500">
+            {errorMissions && <p>Error loading missions: {errorMissions.message}</p>}
+            {errorMasters && <p>Error loading masters: {errorMasters.message}</p>}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -106,10 +146,10 @@ const Missions = () => {
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {missions.map((mission, index) => {
+              {missionsData?.map((mission) => {
                 const master = getMaster(mission.masterId);
                 return (
-                  <Card key={index} className="bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
+                  <Card key={mission.id} className="bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
@@ -150,14 +190,14 @@ const Missions = () => {
                       
                       <div className="flex items-center justify-between">
                         <div className="flex gap-2">
-                          {mission.rewards.attributes && Object.entries(mission.rewards.attributes).map(([attr, val], i) => (
-                            <Badge key={i} variant="outline" className="bg-primary/10">
+                          {mission.rewards.attributes && Object.entries(mission.rewards.attributes).map(([attr, val]) => (
+                            <Badge key={attr} variant="outline" className="bg-primary/10">
                               +{val} {attr}
                             </Badge>
                           ))}
                         </div>
-                        <Button variant="default" size="sm">
-                          Iniciar Missão
+                        <Button variant="default" size="sm" asChild>
+                           <Link to={`/missions/${mission.id}`}>Iniciar Missão</Link>
                         </Button>
                       </div>
                     </div>

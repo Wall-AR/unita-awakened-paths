@@ -9,8 +9,8 @@ export interface Path {
     to: string;
   };
   keyElements: string[];
-  masters: string[];
-  courses?: string[];
+  masterIds?: string[]; // Renamed from masters
+  courseIds?: string[]; // Renamed from courses
 }
 
 export interface SpecializationPath {

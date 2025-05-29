@@ -1,27 +1,7 @@
 
-export interface Course {
-  id: string;
-  title: string;
-  tradition: string;
-  description: string;
-  icon: string;
-  duration: string;
-  lessons: number;
-  modules?: number;
-  level: string;
-  isNew?: boolean;
-  isFeatured?: boolean;
-  isFree?: boolean; 
-  premium?: boolean;
-  prerequisites?: string[];
-  skills?: string[];
-  coverImage?: string;
-  path: string;
-  material?: string;
-  mainMasters?: string[];
-}
+import { Course } from "@/types/course";
 
-// Helper categories
+// Helper categories - these will be validated by the CourseLevelName type in Course interface
 const LEVEL_BEGINNER = "Iniciante";
 const LEVEL_INTERMEDIATE = "Intermediário";
 const LEVEL_ADVANCED = "Avançado";
@@ -43,10 +23,11 @@ export const courses: Course[] = [
     isFeatured: true,
     isFree: true,
     premium: false,
-    path: "Tradição Abraâmica",
+    pathName: "Tradição Abraâmica", // Renamed from path
     material: "Bíblia Sagrada, textos apócrifos, material sobre interpretação cabalística da Bíblia",
-    mainMasters: ["Jesus Cristo", "Moisés", "Teresa de Ávila"],
-    skills: ["Interpretação Simbólica", "Meditação Contemplativa", "Compreensão Contextual"]
+    mainMasterIds: ["jesus", "unknown-moises", "teresa-avila"], 
+    skills: ["Interpretação Simbólica", "Meditação Contemplativa", "Compreensão Contextual"],
+    structure: undefined, // Added as it's in global Course type
   },
   {
     id: "cabala-mistica",
@@ -59,10 +40,11 @@ export const courses: Course[] = [
     level: LEVEL_INTERMEDIATE_ADVANCED,
     isFree: false,
     premium: true,
-    path: "Tradição Abraâmica",
+    pathName: "Tradição Abraâmica", // Renamed from path
     material: "\"A Cabala Mística\" de Dion Fortune, textos do Zohar, Sefer Yetzirah",
-    mainMasters: ["Moisés", "Dion Fortune"],
-    skills: ["Compreensão das Sefirot", "Meditação Cabalística", "Correspondências Simbólicas"]
+    mainMasterIds: ["unknown-moises", "unknown-dion-fortune"],
+    skills: ["Compreensão das Sefirot", "Meditação Cabalística", "Correspondências Simbólicas"],
+    structure: undefined,
   },
   {
     id: "misticismo-cristao",
@@ -73,10 +55,11 @@ export const courses: Course[] = [
     duration: "18-22 horas",
     lessons: 20,
     level: LEVEL_INTERMEDIATE,
-    path: "Tradição Abraâmica",
+    pathName: "Tradição Abraâmica", // Renamed from path
     material: "Textos de místicos cristãos como Mestre Eckhart, São João da Cruz, Teresa de Ávila",
-    mainMasters: ["Jesus Cristo", "Teresa de Ávila", "São Francisco de Assis"],
-    skills: ["Oração Contemplativa", "Teologia Negativa", "União Mística"]
+    mainMasterIds: ["jesus", "teresa-avila", "unknown-sao-francisco-de-assis"],
+    skills: ["Oração Contemplativa", "Teologia Negativa", "União Mística"],
+    structure: undefined,
   },
   {
     id: "sufismo",
@@ -88,10 +71,11 @@ export const courses: Course[] = [
     lessons: 18,
     level: LEVEL_INTERMEDIATE,
     isNew: true,
-    path: "Tradição Abraâmica",
+    pathName: "Tradição Abraâmica", // Renamed from path
     material: "Textos de Rumi, Ibn 'Arabi, Hazrat Inayat Khan",
-    mainMasters: ["Rumi"],
-    skills: ["Dhikr (Lembrança)", "Contemplação", "Poesia Mística", "Dança Espiritual"]
+    mainMasterIds: ["rumi"],
+    skills: ["Dhikr (Lembrança)", "Contemplação", "Poesia Mística", "Dança Espiritual"],
+    structure: undefined,
   },
   
   // Tradição Hermética
@@ -105,10 +89,11 @@ export const courses: Course[] = [
     lessons: 21,
     level: LEVEL_BEGINNER_INTERMEDIATE,
     isFeatured: true,
-    path: "Tradição Hermética",
+    pathName: "Tradição Hermética", // Renamed from path
     material: "\"O Caibalion\", textos herméticos complementares, Corpus Hermeticum",
-    mainMasters: ["Hermes Trismegisto"],
-    skills: ["Mentalismo", "Correspondência", "Vibração", "Polaridade", "Ritmo", "Causa e Efeito", "Gênero"]
+    mainMasterIds: ["hermes"],
+    skills: ["Mentalismo", "Correspondência", "Vibração", "Polaridade", "Ritmo", "Causa e Efeito", "Gênero"],
+    structure: undefined,
   },
   {
     id: "alquimia-ocidental",
@@ -119,10 +104,11 @@ export const courses: Course[] = [
     duration: "18-22 horas",
     lessons: 24,
     level: LEVEL_ADVANCED,
-    path: "Tradição Hermética",
+    pathName: "Tradição Hermética", // Renamed from path
     material: "Textos de Paracelso, Nicolas Flamel, material sobre simbolismo alquímico",
-    mainMasters: ["Hermes Trismegisto", "Saint Germain"],
-    skills: ["Calcinação", "Dissolução", "Separação", "Conjunção", "Fermentação", "Destilação", "Coagulação"]
+    mainMasterIds: ["hermes", "unknown-saint-germain"],
+    skills: ["Calcinação", "Dissolução", "Separação", "Conjunção", "Fermentação", "Destilação", "Coagulação"],
+    structure: undefined,
   },
   {
     id: "tabua-esmeralda",
@@ -133,10 +119,11 @@ export const courses: Course[] = [
     duration: "14-16 horas",
     lessons: 15,
     level: LEVEL_INTERMEDIATE,
-    path: "Tradição Hermética",
+    pathName: "Tradição Hermética", // Renamed from path
     material: "Traduções da Tábua de Esmeralda, comentários históricos",
-    mainMasters: ["Hermes Trismegisto"],
-    skills: ["Interpretação Simbólica", "Princípios Herméticos", "Alquimia Filosófica"]
+    mainMasterIds: ["hermes"],
+    skills: ["Interpretação Simbólica", "Princípios Herméticos", "Alquimia Filosófica"],
+    structure: undefined,
   },
   
   // Tradição Oriental
@@ -149,10 +136,11 @@ export const courses: Course[] = [
     duration: "16-20 horas",
     lessons: 18,
     level: LEVEL_INTERMEDIATE,
-    path: "Tradição Oriental",
+    pathName: "Tradição Oriental", // Renamed from path
     material: "\"A Voz do Silêncio\" de H.P. Blavatsky, textos originais budistas",
-    mainMasters: ["Buda", "Helena Blavatsky"],
-    skills: ["Meditação Mindfulness", "Compaixão (Metta)", "Impermanência", "Não-eu"]
+    mainMasterIds: ["buda", "helena-blavatsky"],
+    skills: ["Meditação Mindfulness", "Compaixão (Metta)", "Impermanência", "Não-eu"],
+    structure: undefined,
   },
   {
     id: "vedanta",
@@ -163,10 +151,11 @@ export const courses: Course[] = [
     duration: "20-24 horas",
     lessons: 22,
     level: LEVEL_INTERMEDIATE,
-    path: "Tradição Oriental",
+    pathName: "Tradição Oriental", // Renamed from path
     material: "Upanishads, Bhagavad Gita, textos de Vivekananda e Ramakrishna",
-    mainMasters: ["Krishna", "Sri Aurobindo"],
-    skills: ["Meditação Védica", "Auto-Indagação", "Compreensão do Não-Dualismo"]
+    mainMasterIds: ["unknown-krishna", "unknown-sri-aurobindo"],
+    skills: ["Meditação Védica", "Auto-Indagação", "Compreensão do Não-Dualismo"],
+    structure: undefined,
   },
   {
     id: "tao-te-ching",
@@ -177,10 +166,11 @@ export const courses: Course[] = [
     duration: "14-18 horas",
     lessons: 16,
     level: LEVEL_BEGINNER_INTERMEDIATE,
-    path: "Tradição Oriental",
+    pathName: "Tradição Oriental", // Renamed from path
     material: "Tao Te Ching, I Ching, comentários de mestres taoistas",
-    mainMasters: ["Lao Tsé"],
-    skills: ["Wu-Wei (Não-ação)", "Equilíbrio Yin-Yang", "Simplicidade", "Flexibilidade"]
+    mainMasterIds: ["lao-tse"],
+    skills: ["Wu-Wei (Não-ação)", "Equilíbrio Yin-Yang", "Simplicidade", "Flexibilidade"],
+    structure: undefined,
   },
   
   // Tradição Egípcia
@@ -193,10 +183,11 @@ export const courses: Course[] = [
     duration: "16-20 horas",
     lessons: 18,
     level: LEVEL_INTERMEDIATE,
-    path: "Tradição Egípcia",
+    pathName: "Tradição Egípcia", // Renamed from path
     material: "Traduções do Livro Egípcio dos Mortos, material sobre mitologia egípcia",
-    mainMasters: ["Hermes Trismegisto"],
-    skills: ["Navegação do Mundo Inferior", "Rituais de Transição", "Simbologia Sagrada"]
+    mainMasterIds: ["hermes"],
+    skills: ["Navegação do Mundo Inferior", "Rituais de Transição", "Simbologia Sagrada"],
+    structure: undefined,
   },
 
   // Exemplos de cursos das outras tradições...
@@ -209,10 +200,11 @@ export const courses: Course[] = [
     duration: "24-30 horas",
     lessons: 28,
     level: LEVEL_ADVANCED,
-    path: "Tradição Ocidental Moderna",
+    pathName: "Tradição Ocidental Moderna", // Renamed from path
     material: "\"Dogma e Ritual da Alta Magia\" de Eliphas Levi",
-    mainMasters: ["Eliphas Levi"],
-    skills: ["Ritual Mágico", "Simbolismo Ocultista", "Desenvolvimento da Vontade"]
+    mainMasterIds: ["unknown-eliphas-levi"],
+    skills: ["Ritual Mágico", "Simbolismo Ocultista", "Desenvolvimento da Vontade"],
+    structure: undefined,
   },
   
   // Cursos integradores
@@ -227,9 +219,148 @@ export const courses: Course[] = [
     level: LEVEL_BEGINNER_INTERMEDIATE,
     isNew: true,
     isFeatured: true,
-    path: "Caminhos Integradores",
+    pathName: "Caminhos Integradores", // Renamed from path
     material: "\"Como se Tornar Sobrenatural\" de Joe Dispenza, pesquisas neurocientíficas",
-    skills: ["Meditação Baseada em Ciência", "Reprogramação Neural", "Estados Elevados de Consciência"]
+    mainMasterIds: ["unknown-joe-dispenza"], // Added this line, assuming Joe Dispenza is a master
+    skills: ["Meditação Baseada em Ciência", "Reprogramação Neural", "Estados Elevados de Consciência"],
+    structure: undefined,
+  },
+  // Added Placeholder Courses
+  {
+    id: "unknown-zen-alem-da-mente-dualista",
+    title: "Zen: Além da Mente Dualista",
+    tradition: "Zen Budismo",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Intermediário",
+    pathName: "Tradição Oriental",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-mitos-misterios-egito",
+    title: "Mitos e Mistérios do Antigo Egito",
+    tradition: "Egípcia",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Intermediário",
+    pathName: "Tradição Egípcia",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-teosofia-sabedoria-divina",
+    title: "Teosofia: A Sabedoria Divina",
+    tradition: "Teosofia",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Intermediário",
+    pathName: "Tradição Ocidental Moderna",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-rosacrucianismo-caminho",
+    title: "Rosacrucianismo: O Caminho da Rosa e da Cruz",
+    tradition: "Rosacrucianismo",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Intermediário",
+    pathName: "Tradição Ocidental Moderna",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-cozinha-bruxa",
+    title: "A Cozinha da Bruxa: Ervas e Rituais",
+    tradition: "Xamanismo/Paganismo",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Iniciante",
+    pathName: "Tradição Xamânica e Pagã",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-xamanismo-global",
+    title: "Xamanismo Global: Técnicas de Êxtase",
+    tradition: "Xamanismo",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Intermediário",
+    pathName: "Tradição Xamânica e Pagã",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-simbolos-universais",
+    title: "Símbolos Universais: A Linguagem do Inconsciente Coletivo",
+    tradition: "Psicologia Analítica/Simbologia",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Intermediário",
+    pathName: "Caminhos Integradores",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
+  },
+  {
+    id: "unknown-mapeando-consciencia",
+    title: "Mapeando a Consciência: Estados Alterados e Expansão da Mente",
+    tradition: "Estudos da Consciência",
+    description: "Details to be added.",
+    icon: "❓",
+    duration: "N/A",
+    lessons: 0,
+    level: "Avançado",
+    pathName: "Caminhos Integradores",
+    isFree: false,
+    premium: true,
+    skills: [],
+    prerequisites: [],
+    mainMasterIds: [],
+    structure: undefined,
   }
 ];
 
