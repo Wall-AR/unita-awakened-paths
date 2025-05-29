@@ -206,40 +206,7 @@ const MasterDetail = () => {
             )}
           </section>
         </div>
-          ) : (
-            <p>Nenhum curso diretamente associado a este mestre encontrado.</p>
-          )}
-        </section>
-
-        <section id="master-missions" className="mb-12">
-          <h2 className="mb-6 text-3xl font-semibold">Missões Guiadas</h2>
-          {masterMissions.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {masterMissions.map((mission) => (
-                <Card key={mission.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle>{mission.title}</CardTitle>
-                      <AccessBadge contentType="mission" requiredTier={mission.requiredTier} />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{mission.description?.substring(0, 150)}...</p>
-                    {/* Consider showing mission type or difficulty */}
-                  </CardContent>
-                  <div className="p-6 pt-0">
-                    <Link to={`/missions/${mission.id}`}>
-                      <Button variant="outline" className="w-full">Ver Missão</Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p>Nenhuma missão diretamente guiada por este mestre encontrada.</p>
-          )}
-        </section>
-
+        {/* The duplicated sections below were removed */}
       </main>
       <Footer />
     </>
