@@ -2,8 +2,8 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getBlogPostBySlug } from "@/services/blogService";
 import type { BlogPost } from "@/types";
-import { Header } from "@/components/Header"; 
-import { Footer } from "@/components/Footer"; 
+import Header from "@/components/Header"; // Changed to default import
+import Footer from "@/components/Footer"; // Changed to default import
 import {
   Breadcrumb,
   BreadcrumbList,

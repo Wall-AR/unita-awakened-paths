@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCourses } from "@/services/courseService";
 import type { Course } from "@/types";
-import { Header } from "@/components/Header"; 
-import { Footer } from "@/components/Footer"; 
+import Header from "@/components/Header"; // Changed to default import
+import Footer from "@/components/Footer"; // Changed to default import
 import {
   Breadcrumb,
   BreadcrumbList,
