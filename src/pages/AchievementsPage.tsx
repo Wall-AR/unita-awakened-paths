@@ -1,5 +1,5 @@
-import { Header } from "@/components/Header"; 
-import { Footer } from "@/components/Footer"; 
+import Header from "@/components/Header"; // Changed to default import
+import Footer from "@/components/Footer"; // Changed to default import
 import {
   Breadcrumb,
   BreadcrumbList,

@@ -7,8 +7,8 @@ import { Lock } from "lucide-react"; // Added
 import { getCourses } from "@/services/courseService"; // Fetch all and filter
 import { getMasters } from "@/services/masterService"; // Fetch all and filter
 import type { Path, Course, Master } from "@/types";
-import { Header } from "@/components/Header"; 
-import { Footer } from "@/components/Footer"; 
+import Header from "@/components/Header"; // Changed to default import
+import Footer from "@/components/Footer"; // Changed to default import
 import {
   Breadcrumb,
   BreadcrumbList,
